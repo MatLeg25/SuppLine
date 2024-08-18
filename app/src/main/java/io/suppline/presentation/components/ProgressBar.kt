@@ -27,7 +27,7 @@ fun ProgressBar(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = progressPercent)
-        AnimatedLinearProgressIndicator(modifier, progress)
+        AnimatedLinearProgressIndicator(modifier = modifier, progress = progress)
     }
 
 }
