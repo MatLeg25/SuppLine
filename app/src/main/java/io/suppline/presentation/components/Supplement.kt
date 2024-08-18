@@ -13,7 +13,12 @@ import androidx.compose.ui.unit.dp
 import io.suppline.domain.models.Supplement
 
 @Composable
-fun Supplement(modifier: Modifier = Modifier, model: Supplement) {
+fun Supplement(
+    modifier: Modifier = Modifier,
+    model: Supplement,
+    isConsumed: Boolean,
+    onClick: () -> Unit
+) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -26,7 +31,11 @@ fun Supplement(modifier: Modifier = Modifier, model: Supplement) {
             overflow = TextOverflow.Ellipsis
         )
         Spacer(modifier = Modifier.weight(0.05f))
-        SelectionButton(modifier = Modifier.weight(0.3f))
+        SelectionButton(
+            modifier = Modifier.weight(0.3f),
+            isSelected = isConsumed,
+            onClick = { onClick() }
+        )
 
     }
 }

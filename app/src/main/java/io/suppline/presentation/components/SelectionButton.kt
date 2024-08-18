@@ -20,23 +20,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import io.suppline.R
 
-@Preview
 @Composable
-fun SelectionButton(modifier: Modifier = Modifier) {
-    var isSelected by remember { mutableStateOf(false) }
-
+fun SelectionButton(
+    modifier: Modifier = Modifier,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+) {
     val animatedButtonColor = animateColorAsState(
         targetValue = if (isSelected) Color.Green else Color.LightGray,
         animationSpec = tween(1000, 0, LinearEasing),
         label = stringResource(id = R.string.app_name)
     )
 
-    Button(colors = ButtonColors(
-        containerColor = animatedButtonColor.value,
-        contentColor = animatedButtonColor.value,
-        disabledContainerColor = animatedButtonColor.value,
-        disabledContentColor = animatedButtonColor.value,
-    ), onClick = { isSelected = !isSelected }) {
+    Button(
+        modifier = modifier,
+        colors = ButtonColors(
+            containerColor = animatedButtonColor.value,
+            contentColor = animatedButtonColor.value,
+            disabledContainerColor = animatedButtonColor.value,
+            disabledContentColor = animatedButtonColor.value,
+        ),
+        onClick = { onClick() }) {
+
         AnimatedVisibility(visible = isSelected) {
             Icon(
                 imageVector = Icons.Default.Done,
