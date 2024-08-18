@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SuppLine</string>
+    <string name="toggle_consumed_state">Toggle consumed state</string>
 </resources>
