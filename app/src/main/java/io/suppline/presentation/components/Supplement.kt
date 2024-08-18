@@ -2,6 +2,7 @@ package io.suppline.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,11 +19,12 @@ fun Supplement(modifier: Modifier = Modifier, name: String) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            modifier = Modifier.weight(0.7f),
+            modifier = Modifier.weight(0.65f),
             text = name,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+        Spacer(modifier = Modifier.weight(0.05f))
         SelectionButton(modifier = Modifier.weight(0.3f))
 
     }
