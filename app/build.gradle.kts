@@ -60,6 +60,8 @@ dependencies {
     kapt(libs.hilt.compiler)
     androidTestImplementation(libs.hilt.android.testing)
 
+    // GSON
+    implementation(libs.gson)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
