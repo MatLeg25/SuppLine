@@ -54,11 +54,11 @@ android {
 dependencies {
 
     //Dagger - Hilt
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    annotationProcessor("com.google.dagger:hilt-compiler:2.51.1")
-    kapt("com.google.dagger:hilt-compiler:2.51.1")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    annotationProcessor(libs.hilt.compiler)
+    kapt(libs.hilt.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
 
 
     implementation(libs.androidx.core.ktx)
