@@ -13,6 +13,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
+import io.suppline.presentation.components.ProgressBar
 import io.suppline.presentation.components.Supplement
 import io.suppline.presentation.ui.theme.SuppLineTheme
 
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         item {
-                            LinearProgressIndicator(progress = { state.progress })
+                            ProgressBar(progress = state.progress)
                         }
                     }
 
