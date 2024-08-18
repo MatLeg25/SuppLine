@@ -21,17 +21,17 @@ class DefaultPreferences(
 
         return if (!supplementsJson.isNullOrBlank()) {
             sharedPref.edit()
-                .putString(Preferences.KEY_DAILY_SUPPLEMENTS, supplements.toString())
+                .putString(Preferences.KEY_DAILY_SUPPLEMENTS, supplementsJson)
                 .apply()
             true
         } else false
     }
 
     override fun loadDailySupplements(): List<Supplement>? {
-        val listType = object : TypeToken<List<Supplement>>() {}
         val supplementsJson = sharedPref.getString(Preferences.KEY_DAILY_SUPPLEMENTS, null)
 
         return if (supplementsJson != null) {
+            val listType = object : TypeToken<List<Supplement>>() {}.type
             gson.fromJson(supplementsJson, listType)
         } else {
             null

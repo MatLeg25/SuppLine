@@ -10,9 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import io.suppline.domain.models.Supplement
 
 @Composable
-fun Supplement(modifier: Modifier = Modifier, name: String) {
+fun Supplement(modifier: Modifier = Modifier, model: Supplement) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -20,7 +21,7 @@ fun Supplement(modifier: Modifier = Modifier, name: String) {
     ) {
         Text(
             modifier = Modifier.weight(0.65f),
-            text = name,
+            text = model.name,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
