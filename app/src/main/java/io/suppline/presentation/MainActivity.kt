@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
 
                         items(state.supplementsMap.keys.toList()) {
                             Supplement(
-                                modifier = Modifier.padding(innerPadding),
+                                modifier = Modifier,
                                 model = it,
                                 isConsumed = state.supplementsMap[it] ?: false,
                                 onClick = { viewModel.toggleConsumed(it) }
