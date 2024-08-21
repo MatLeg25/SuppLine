@@ -20,31 +20,22 @@ class SuppLineViewModel @Inject constructor(
     val state: State<SuppLineState> = _state
 
     init {
-        preferences.clear()
-        println(">>>>>>>>> clear")
-        val defaultSupplements = Config.DEFAULT_SUPPLEMENTS
-        preferences.saveDailySupplementation(
-            DailySupplementation(
-                date = LocalDate.now(),
-                supplements = defaultSupplements.associateWith { true }
-            )
-        )
         fetchData()
     }
 
     private fun fetchData() {
-        println(">>>>>>>>> fetchData start")
+        //fetch from preferences or create new based on default
         val supplementation = preferences.loadDailySupplements() ?: kotlin.run {
-            val defaultSupplements = Config.DEFAULT_SUPPLEMENTS
             DailySupplementation(
-                date = LocalDate.now(),
-                supplements = defaultSupplements.associateWith { false }
+                date = LocalDate.now().plusDays(9),
+                supplements = Config.DEFAULT_SUPPLEMENTS.associateWith { false }
             )
         }
-        println(">>>>>>>>> fetchData = $supplementation")
         _state.value = state.value.copy(
+            date = supplementation.date,
             supplementsMap = supplementation.supplements
         )
+        setProgress()
     }
 
     private fun setProgress() {
@@ -64,6 +55,9 @@ class SuppLineViewModel @Inject constructor(
             _state.value = copy(supplementsMap = map)
         }
         setProgress()
+        preferences.saveDailySupplementation(
+            DailySupplementation(state.value.date, state.value.supplementsMap)
+        )
     }
 
 
