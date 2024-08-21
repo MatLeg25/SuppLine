@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.suppline.domain.Config
+import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.models.Supplement
 import io.suppline.domain.preferences.Preferences
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,13 +20,30 @@ class SuppLineViewModel @Inject constructor(
     val state: State<SuppLineState> = _state
 
     init {
+        preferences.clear()
+        println(">>>>>>>>> clear")
+        val defaultSupplements = Config.DEFAULT_SUPPLEMENTS
+        preferences.saveDailySupplementation(
+            DailySupplementation(
+                date = LocalDate.now(),
+                supplements = defaultSupplements.associateWith { true }
+            )
+        )
         fetchData()
     }
 
     private fun fetchData() {
-        val supplements = preferences.loadDailySupplements() ?: Config.DEFAULT_SUPPLEMENTS
+        println(">>>>>>>>> fetchData start")
+        val supplementation = preferences.loadDailySupplements() ?: kotlin.run {
+            val defaultSupplements = Config.DEFAULT_SUPPLEMENTS
+            DailySupplementation(
+                date = LocalDate.now(),
+                supplements = defaultSupplements.associateWith { false }
+            )
+        }
+        println(">>>>>>>>> fetchData = $supplementation")
         _state.value = state.value.copy(
-            supplementsMap = supplements.associateWith { false } //todo load state from memory
+            supplementsMap = supplementation.supplements
         )
     }
 

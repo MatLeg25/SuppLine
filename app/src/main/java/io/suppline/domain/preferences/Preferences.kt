@@ -1,6 +1,6 @@
 package io.suppline.domain.preferences
 
-import io.suppline.domain.models.Supplement
+import io.suppline.domain.models.DailySupplementation
 
 interface Preferences {
 
@@ -9,6 +9,6 @@ interface Preferences {
     }
 
     fun clear()
-    fun saveDailySupplements(supplements: List<Supplement>): Boolean
-    fun loadDailySupplements(): List<Supplement>?
+    fun saveDailySupplementation(supplementation: DailySupplementation): Boolean
+    fun loadDailySupplements(): DailySupplementation?
 }

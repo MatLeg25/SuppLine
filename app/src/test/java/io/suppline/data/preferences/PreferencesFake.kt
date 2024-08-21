@@ -11,7 +11,7 @@ class PreferencesFake: Preferences {
         dailySupplements = null
     }
 
-    override fun saveDailySupplements(supplements: List<Supplement>): Boolean {
+    override fun saveDailySupplementation(supplements: List<Supplement>): Boolean {
         dailySupplements = supplements
         return true
     }
