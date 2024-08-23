@@ -9,6 +9,7 @@ import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.models.Supplement
 import io.suppline.domain.preferences.Preferences
 import java.time.LocalDate
+import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,6 +21,7 @@ class SuppLineViewModel @Inject constructor(
     val state: State<SuppLineState> = _state
 
     init {
+
         fetchData()
     }
 
@@ -28,12 +30,19 @@ class SuppLineViewModel @Inject constructor(
         val supplementation = preferences.loadDailySupplements() ?: kotlin.run {
             DailySupplementation(
                 date = LocalDate.now().plusDays(9),
-                supplements = Config.DEFAULT_SUPPLEMENTS.associateWith { false }
+                supplements = Config.DEFAULT_SUPPLEMENT_NAMES.mapIndexed { index, s ->
+                    Supplement(
+                        id = index,
+                        name = s,
+                        consumed = false,
+                        timeToConsume = LocalTime.now()
+                    )
+                }
             )
         }
         _state.value = state.value.copy(
             date = supplementation.date,
-            supplementsMap = supplementation.supplements
+            supplements = supplementation.supplements
         )
         setProgress()
     }
@@ -41,8 +50,8 @@ class SuppLineViewModel @Inject constructor(
     private fun setProgress() {
         with(state.value) {
             _state.value = copy(
-                progress = if (supplementsMap.isNotEmpty()) {
-                    (supplementsMap.values.count { it } / supplementsMap.size.toFloat())
+                progress = if (supplements.isNotEmpty()) {
+                    (supplements.count { it.consumed } / supplements.size.toFloat())
                 } else 0f
             )
         }
@@ -50,13 +59,16 @@ class SuppLineViewModel @Inject constructor(
 
     fun toggleConsumed(supplement: Supplement) {
         with(state.value) {
-            val map = supplementsMap.toMutableMap()
-            map[supplement] = !map.getOrDefault(supplement, false)
-            _state.value = copy(supplementsMap = map)
+            val list = supplements.toMutableList()
+            val indexToReplace = list.indexOf(supplement)
+            if (indexToReplace in 0.. list.lastIndex) {
+                list[indexToReplace] = supplement.copy(consumed = !supplement.consumed)
+            }
+            _state.value = copy(supplements = list)
         }
         setProgress()
         preferences.saveDailySupplementation(
-            DailySupplementation(state.value.date, state.value.supplementsMap)
+            DailySupplementation(state.value.date, state.value.supplements)
         )
     }
 

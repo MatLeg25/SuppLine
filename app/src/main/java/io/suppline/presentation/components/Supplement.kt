@@ -16,7 +16,6 @@ import io.suppline.domain.models.Supplement
 fun Supplement(
     modifier: Modifier = Modifier,
     model: Supplement,
-    isConsumed: Boolean,
     onClick: () -> Unit
 ) {
     Row(
@@ -33,11 +32,10 @@ fun Supplement(
         Spacer(modifier = Modifier.weight(0.05f))
         SelectionButton(
             modifier = Modifier.weight(0.3f),
-            isSelected = isConsumed,
+            isSelected = model.consumed,
             onClick = { onClick() }
         )
         Spacer(modifier = Modifier.weight(0.05f))
         ConsumeTime(length = 50.dp)
-
     }
 }

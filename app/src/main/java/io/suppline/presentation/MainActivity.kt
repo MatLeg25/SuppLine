@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -49,12 +48,11 @@ class MainActivity : ComponentActivity() {
                         Spacer(modifier = Modifier.weight(0.1f))
                         LazyColumn(modifier = Modifier.weight(0.9f)) {
 
-                            itemsIndexed(state.supplementsMap.keys.toList()) { index, item ->
+                            itemsIndexed(state.supplements) { index, item ->
                                 if (index == 0) HorizontalDivider()
                                 Supplement(
                                     modifier = Modifier,
                                     model = item,
-                                    isConsumed = state.supplementsMap[item] ?: false,
                                     onClick = { viewModel.toggleConsumed(item) }
                                 )
                                 HorizontalDivider()

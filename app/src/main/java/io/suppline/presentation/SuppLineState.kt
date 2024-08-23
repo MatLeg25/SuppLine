@@ -5,6 +5,6 @@ import java.time.LocalDate
 
 data class SuppLineState(
     val date: LocalDate = LocalDate.now(),
-    val supplementsMap: Map<Supplement, Boolean> = emptyMap(),
+    val supplements: List<Supplement> = emptyList(),
     val progress: Float = 0f,
 )
