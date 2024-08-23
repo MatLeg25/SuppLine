@@ -5,17 +5,21 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
+import io.suppline.presentation.components.Logo
 import io.suppline.presentation.components.ProgressBar
 import io.suppline.presentation.components.Supplement
 import io.suppline.presentation.ui.theme.SuppLineTheme
@@ -34,27 +38,33 @@ class MainActivity : ComponentActivity() {
                 val state = viewModel.state.value
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LazyColumn(
+                    Column(
                         modifier = Modifier.padding(innerPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
+                        Logo()
+                        Spacer(modifier = Modifier.weight(0.1f))
+                        LazyColumn(modifier = Modifier.weight(0.9f)) {
 
-                        items(state.supplementsMap.keys.toList()) {
-                            Supplement(
-                                modifier = Modifier,
-                                model = it,
-                                isConsumed = state.supplementsMap[it] ?: false,
-                                onClick = { viewModel.toggleConsumed(it) }
-                            )
-                        }
+                            items(state.supplementsMap.keys.toList()) {
+                                Supplement(
+                                    modifier = Modifier,
+                                    model = it,
+                                    isConsumed = state.supplementsMap[it] ?: false,
+                                    onClick = { viewModel.toggleConsumed(it) }
+                                )
+                            }
 
-                        item {
-                            ProgressBar(
-                                modifier = Modifier.fillMaxWidth().height(24.dp),
-                                progress = state.progress
-                            )
+                            item {
+                                Spacer(modifier = Modifier.height(24.dp))
+                                ProgressBar(
+                                    modifier = Modifier.fillMaxWidth().height(24.dp),
+                                    progress = state.progress
+                                )
+                            }
                         }
                     }
-
                 }
             }
         }
