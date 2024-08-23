@@ -55,7 +55,8 @@ class MainActivity : ComponentActivity() {
                                     model = item,
                                     isEditable = state.isEditMode,
                                     onClick = { viewModel.toggleConsumed(item) },
-                                    toggleEditMode = { viewModel.toggleEditMode() }
+                                    toggleEditMode = { viewModel.toggleEditMode() },
+                                    setConsumedTime = viewModel::setConsumedTime,
                                 )
                                 HorizontalDivider()
                             }

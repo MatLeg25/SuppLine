@@ -76,5 +76,16 @@ class SuppLineViewModel @Inject constructor(
         _state.value = state.value.copy(isEditMode = !state.value.isEditMode)
     }
 
+    fun setConsumedTime(supplement: Supplement, hour: Int, min: Int) {
+        with(state.value) {
+            val list = supplements.toMutableList()
+            val indexToReplace = list.indexOf(supplement)
+            if (indexToReplace in 0.. list.lastIndex) {
+                list[indexToReplace] = supplement.copy(timeToConsume = LocalTime.of(hour, min))
+            }
+            _state.value = copy(supplements = list)
+        }
+    }
+
 
 }

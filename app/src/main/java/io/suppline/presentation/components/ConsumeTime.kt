@@ -24,28 +24,36 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.suppline.domain.models.Supplement
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Composable
-@Preview
 fun ConsumeTime(
     modifier: Modifier = Modifier,
     isEditable: Boolean = true,
-    time: LocalDateTime = LocalDateTime.now(),
-    length: Dp = 100.dp
+    length: Dp = 100.dp,
+    model: Supplement,
+    setConsumedTime: (supplement: Supplement, hour: Int, min: Int) -> Unit
 ) {
     val height = length / 2
+    val time = model.timeToConsume
+
+    fun setTime(h: Int, min: Int) {
+        setConsumedTime(model, time.hour + h, time.minute + min)
+    }
+
 
     Row(
         modifier = modifier.height(if (isEditable) height.times(4) else length),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HalfTablet(time = time.hour.toString(), isLeftSide = true, isEditable = isEditable)
+        HalfTablet(time = time.hour, isLeftSide = true, isEditable = isEditable, setConsumedTime = ::setTime)
         Box(contentAlignment = Alignment.Center) {
             VerticalDivider(modifier = Modifier.height(height))
             Text(text = ":")
         }
-        HalfTablet(time = time.hour.toString(), isLeftSide = false, isEditable = isEditable)
+        HalfTablet(time = time.minute, isLeftSide = false, isEditable = isEditable, setConsumedTime = ::setTime)
     }
 
 }
@@ -55,8 +63,9 @@ fun HalfTablet(
     modifier: Modifier = Modifier,
     isEditable: Boolean = true,
     isLeftSide: Boolean = true,
-    time: String = "12",
-    height: Dp = 50.dp
+    time: Int = 12,
+    height: Dp = 50.dp,
+    setConsumedTime: (hour: Int, min: Int) -> Unit
 ) {
     val shape: RoundedCornerShape
     val color: Color
@@ -74,7 +83,9 @@ fun HalfTablet(
 
     Column(modifier = modifier) {
         if (isEditable) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = {
+                if (isLeftSide) setConsumedTime(1, 0) else setConsumedTime(0, 1)
+            }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "KeyboardArrowUp")
             }
         }
@@ -86,12 +97,14 @@ fun HalfTablet(
             contentAlignment = alignment
         ) {
             Text(
-                text = time,
+                text = time.toString(),
                 fontSize = (height / 2).value.sp
             )
         }
         if (isEditable) {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = {
+                if (isLeftSide) setConsumedTime(-1, 0) else setConsumedTime(0, -1)
+            }) {
                 Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "KeyboardArrowDown")
             }
         }

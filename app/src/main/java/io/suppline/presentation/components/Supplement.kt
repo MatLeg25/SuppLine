@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.suppline.domain.models.Supplement
+import java.time.LocalTime
 
 @Composable
 fun Supplement(
@@ -19,7 +20,8 @@ fun Supplement(
     model: Supplement,
     isEditable: Boolean,
     onClick: () -> Unit,
-    toggleEditMode: () -> Unit
+    toggleEditMode: () -> Unit,
+    setConsumedTime: (supplement: Supplement, hour: Int, min: Int) -> Unit
 ) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
@@ -44,7 +46,9 @@ fun Supplement(
                 toggleEditMode()
             },
             length = 100.dp,
-            isEditable = isEditable
+            isEditable = isEditable,
+            model = model,
+            setConsumedTime = setConsumedTime
         )
     }
 }
