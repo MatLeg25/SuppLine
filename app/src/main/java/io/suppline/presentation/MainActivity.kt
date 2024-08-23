@@ -53,7 +53,9 @@ class MainActivity : ComponentActivity() {
                                 Supplement(
                                     modifier = Modifier,
                                     model = item,
-                                    onClick = { viewModel.toggleConsumed(item) }
+                                    isEditable = state.isEditMode,
+                                    onClick = { viewModel.toggleConsumed(item) },
+                                    toggleEditMode = { viewModel.toggleEditMode() }
                                 )
                                 HorizontalDivider()
                             }

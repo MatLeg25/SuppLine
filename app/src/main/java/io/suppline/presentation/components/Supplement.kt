@@ -1,5 +1,6 @@
 package io.suppline.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +17,9 @@ import io.suppline.domain.models.Supplement
 fun Supplement(
     modifier: Modifier = Modifier,
     model: Supplement,
-    onClick: () -> Unit
+    isEditable: Boolean,
+    onClick: () -> Unit,
+    toggleEditMode: () -> Unit
 ) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
@@ -36,6 +39,12 @@ fun Supplement(
             onClick = { onClick() }
         )
         Spacer(modifier = Modifier.weight(0.05f))
-        ConsumeTime(length = 50.dp)
+        ConsumeTime(
+            modifier = Modifier.clickable {
+                toggleEditMode()
+            },
+            length = 50.dp,
+            isEditable = isEditable
+        )
     }
 }

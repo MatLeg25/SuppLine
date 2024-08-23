@@ -72,5 +72,9 @@ class SuppLineViewModel @Inject constructor(
         )
     }
 
+    fun toggleEditMode() {
+        _state.value = state.value.copy(isEditMode = !state.value.isEditMode)
+    }
+
 
 }
