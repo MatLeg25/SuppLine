@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SuppLineViewModel @Inject constructor(
     private val preferences: Preferences,
-): ViewModel() {
+) : ViewModel() {
 
     private var _state = mutableStateOf(SuppLineState())
     val state: State<SuppLineState> = _state
@@ -62,7 +62,7 @@ class SuppLineViewModel @Inject constructor(
         with(state.value) {
             val list = supplements.toMutableList()
             val indexToReplace = list.indexOf(supplement)
-            if (indexToReplace in 0.. list.lastIndex) {
+            if (indexToReplace in 0..list.lastIndex) {
                 list[indexToReplace] = supplement.copy(consumed = !supplement.consumed)
             }
             _state.value = copy(supplements = list)
@@ -77,12 +77,18 @@ class SuppLineViewModel @Inject constructor(
         _state.value = state.value.copy(isEditMode = !state.value.isEditMode)
     }
 
-    fun setConsumedTime(supplement: Supplement, hour: Int, min: Int) {
+    fun setConsumedTime(supplement: Supplement, hourDelta: Int, minDelta: Int) {
         with(state.value) {
             val list = supplements.toMutableList()
             val indexToReplace = list.indexOf(supplement)
-            if (indexToReplace in 0.. list.lastIndex) {
-                list[indexToReplace] = supplement.copy(timeToConsume = TimeValidator.validateTime(hour, min))
+            if (indexToReplace in 0..list.lastIndex) {
+                list[indexToReplace] = supplement.copy(
+                    timeToConsume = TimeValidator.validateTime(
+                        time = supplement.timeToConsume,
+                        hourDelta = hourDelta,
+                        minDelta = minDelta
+                    )
+                )
             }
             _state.value = copy(supplements = list)
         }

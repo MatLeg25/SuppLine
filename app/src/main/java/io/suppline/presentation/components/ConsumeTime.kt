@@ -34,26 +34,34 @@ fun ConsumeTime(
     isEditable: Boolean = true,
     length: Dp = 100.dp,
     model: Supplement,
-    setConsumedTime: (supplement: Supplement, hour: Int, min: Int) -> Unit
+    setConsumedTime: (supplement: Supplement, hourDelta: Int, minDelta: Int) -> Unit
 ) {
     val height = length / 2
     val time = model.timeToConsume
-
-    fun setTime(h: Int, min: Int) {
-        setConsumedTime(model, time.hour + h, time.minute + min)
-    }
 
 
     Row(
         modifier = modifier.height(if (isEditable) height.times(4) else length),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        HalfTablet(time = time.hour, isLeftSide = true, isEditable = isEditable, setConsumedTime = ::setTime)
+        HalfTablet(
+            time = time.hour,
+            isLeftSide = true,
+            isEditable = isEditable,
+            model = model,
+            setConsumedTime = setConsumedTime
+        )
         Box(contentAlignment = Alignment.Center) {
             VerticalDivider(modifier = Modifier.height(height))
             Text(text = ":")
         }
-        HalfTablet(time = time.minute, isLeftSide = false, isEditable = isEditable, setConsumedTime = ::setTime)
+        HalfTablet(
+            time = time.minute,
+            isLeftSide = false,
+            isEditable = isEditable,
+            model = model,
+            setConsumedTime = setConsumedTime
+        )
     }
 
 }
@@ -65,7 +73,8 @@ fun HalfTablet(
     isLeftSide: Boolean = true,
     time: Int = 12,
     height: Dp = 50.dp,
-    setConsumedTime: (hour: Int, min: Int) -> Unit
+    model: Supplement,
+    setConsumedTime: (model: Supplement, hourDelta: Int, minDelta: Int) -> Unit
 ) {
     val shape: RoundedCornerShape
     val color: Color
@@ -75,7 +84,7 @@ fun HalfTablet(
         shape = RoundedCornerShape(height / 2, 0.dp, 0.dp, height / 2)
         color = MaterialTheme.colorScheme.primary
         alignment = Alignment.CenterEnd
-    }  else {
+    } else {
         shape = RoundedCornerShape(0.dp, height / 2, height / 2, 0.dp)
         color = MaterialTheme.colorScheme.secondary
         alignment = Alignment.CenterStart
@@ -84,9 +93,12 @@ fun HalfTablet(
     Column(modifier = modifier) {
         if (isEditable) {
             IconButton(onClick = {
-                if (isLeftSide) setConsumedTime(1, 0) else setConsumedTime(0, 1)
+                if (isLeftSide) setConsumedTime(model, 1, 0) else setConsumedTime(model, 0, 1)
             }) {
-                Icon(imageVector = Icons.Default.KeyboardArrowUp, contentDescription = "KeyboardArrowUp")
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "KeyboardArrowUp"
+                )
             }
         }
         Box(
@@ -103,9 +115,12 @@ fun HalfTablet(
         }
         if (isEditable) {
             IconButton(onClick = {
-                if (isLeftSide) setConsumedTime(-1, 0) else setConsumedTime(0, -1)
+                if (isLeftSide) setConsumedTime(model, -1, 0) else setConsumedTime(model, 0, -1)
             }) {
-                Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "KeyboardArrowDown")
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "KeyboardArrowDown"
+                )
             }
         }
 

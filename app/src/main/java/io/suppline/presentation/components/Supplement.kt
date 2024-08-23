@@ -21,7 +21,7 @@ fun Supplement(
     isEditable: Boolean,
     onClick: () -> Unit,
     toggleEditMode: () -> Unit,
-    setConsumedTime: (supplement: Supplement, hour: Int, min: Int) -> Unit
+    setConsumedTime: (supplement: Supplement, hourDelta: Int, minDelta: Int) -> Unit
 ) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
