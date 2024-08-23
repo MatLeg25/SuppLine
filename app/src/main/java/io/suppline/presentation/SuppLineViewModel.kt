@@ -8,6 +8,7 @@ import io.suppline.domain.Config
 import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.models.Supplement
 import io.suppline.domain.preferences.Preferences
+import io.suppline.domain.utils.validators.TimeValidator
 import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
@@ -81,7 +82,7 @@ class SuppLineViewModel @Inject constructor(
             val list = supplements.toMutableList()
             val indexToReplace = list.indexOf(supplement)
             if (indexToReplace in 0.. list.lastIndex) {
-                list[indexToReplace] = supplement.copy(timeToConsume = LocalTime.of(hour, min))
+                list[indexToReplace] = supplement.copy(timeToConsume = TimeValidator.validateTime(hour, min))
             }
             _state.value = copy(supplements = list)
         }
