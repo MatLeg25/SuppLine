@@ -43,7 +43,7 @@ fun Supplement(
             modifier = Modifier.clickable {
                 toggleEditMode()
             },
-            length = 50.dp,
+            length = 100.dp,
             isEditable = isEditable
         )
     }

@@ -37,7 +37,7 @@ fun ConsumeTime(
     val height = length / 2
 
     Row(
-        modifier = modifier.height(if (isEditable) height.times(3) else length),
+        modifier = modifier.height(if (isEditable) height.times(4) else length),
         verticalAlignment = Alignment.CenterVertically
     ) {
         HalfTablet(time = time.hour.toString(), isLeftSide = true, isEditable = isEditable)
