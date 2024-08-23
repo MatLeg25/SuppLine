@@ -36,6 +36,8 @@ fun Supplement(
             isSelected = isConsumed,
             onClick = { onClick() }
         )
+        Spacer(modifier = Modifier.weight(0.05f))
+        ConsumeTime(length = 50.dp)
 
     }
 }
