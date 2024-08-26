@@ -71,7 +71,15 @@ class SuppLineViewModel @Inject constructor(
     }
 
     fun toggleEditMode() {
-        _state.value = state.value.copy(isEditMode = !state.value.isEditMode)
+        val isEditMode = !state.value.isEditMode
+        _state.value = state.value.copy(
+            isEditMode = isEditMode,
+            //when user left editMode, update items order
+            supplements =
+            if (!isEditMode) state.value.supplements.sortedBy { it.timeToConsume }
+            else state.value.supplements
+        )
+
     }
 
     fun setConsumedTime(supplement: Supplement, hourDelta: Int, minDelta: Int) {
