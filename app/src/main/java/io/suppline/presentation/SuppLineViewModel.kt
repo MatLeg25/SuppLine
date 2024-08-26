@@ -22,7 +22,6 @@ class SuppLineViewModel @Inject constructor(
     val state: State<SuppLineState> = _state
 
     init {
-
         fetchData()
     }
 
@@ -68,9 +67,7 @@ class SuppLineViewModel @Inject constructor(
             _state.value = copy(supplements = list)
         }
         setProgress()
-        preferences.saveDailySupplementation(
-            DailySupplementation(state.value.date, state.value.supplements)
-        )
+        saveChanges()
     }
 
     fun toggleEditMode() {
@@ -92,6 +89,13 @@ class SuppLineViewModel @Inject constructor(
             }
             _state.value = copy(supplements = list)
         }
+        saveChanges()
+    }
+
+    private fun saveChanges() {
+        preferences.saveDailySupplementation(
+            DailySupplementation(state.value.date, state.value.supplements)
+        )
     }
 
 

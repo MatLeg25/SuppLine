@@ -7,32 +7,42 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import com.google.gson.reflect.TypeToken
+import io.suppline.data.extensions.toDailySupplementation
+import io.suppline.data.extensions.toDailySupplementationDb
+import io.suppline.data.models.DailySupplementationDb
+import io.suppline.data.models.SupplementDb
 import io.suppline.domain.models.DailySupplementation
-import io.suppline.domain.models.Supplement
 import java.lang.reflect.Type
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class DailySupplementationSerializer : JsonSerializer<DailySupplementation> {
-    override fun serialize(src: DailySupplementation, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+    override fun serialize(
+        src: DailySupplementation,
+        typeOfSrc: Type,
+        context: JsonSerializationContext
+    ): JsonElement {
         val jsonObject = JsonObject()
-        val formatter = DateTimeFormatter.ISO_LOCAL_DATE
-
-        jsonObject.addProperty("date", src.date.format(formatter))
-        jsonObject.add("supplements", context.serialize(src.supplements))
-
+        val dailySupplementationDb = src.toDailySupplementationDb()
+        jsonObject.addProperty(DailySupplementation::date.name, dailySupplementationDb.date)
+        jsonObject.add(
+            DailySupplementation::supplements.name,
+            context.serialize(dailySupplementationDb.supplements)
+        )
         return jsonObject
     }
 }
 
 class DailySupplementationDeserializer : JsonDeserializer<DailySupplementation> {
-    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): DailySupplementation {
+    override fun deserialize(
+        json: JsonElement,
+        typeOfT: Type,
+        context: JsonDeserializationContext
+    ): DailySupplementation {
         val jsonObject = json.asJsonObject
-        val formatter = DateTimeFormatter.ISO_LOCAL_DATE
-
-        val date = LocalDate.parse(jsonObject.get("date").asString, formatter)
-        val supplements = context.deserialize<List<Supplement>>(jsonObject.get("supplements"), object : TypeToken<List<Supplement>>() {}.type)
-
-        return DailySupplementation(date, supplements)
+        val date = jsonObject.get(DailySupplementation::date.name).asLong
+        val supplements = context.deserialize<List<SupplementDb>>(
+            jsonObject.get(DailySupplementation::supplements.name),
+            object : TypeToken<List<SupplementDb>>() {}.type
+        )
+        return DailySupplementationDb(date, supplements).toDailySupplementation()
     }
 }
