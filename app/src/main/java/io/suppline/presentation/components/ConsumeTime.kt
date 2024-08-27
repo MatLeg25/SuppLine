@@ -1,5 +1,6 @@
 package io.suppline.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -88,7 +89,7 @@ fun HalfTablet(
     }
 
     Column(modifier = modifier) {
-        if (isEditable) {
+        AnimatedVisibility(visible = isEditable) {
             IconButton(onClick = {
                 if (isLeftSide) setConsumedTime(model, 1, 0) else setConsumedTime(model, 0, 1)
             }) {
@@ -110,7 +111,7 @@ fun HalfTablet(
                 fontSize = (height / 2).value.sp
             )
         }
-        if (isEditable) {
+        AnimatedVisibility(visible = isEditable) {
             IconButton(onClick = {
                 if (isLeftSide) setConsumedTime(model, -1, 0) else setConsumedTime(model, 0, -1)
             }) {
