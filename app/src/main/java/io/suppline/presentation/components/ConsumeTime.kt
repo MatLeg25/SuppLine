@@ -21,9 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.suppline.R
 import io.suppline.domain.models.Supplement
 
 @Composable
@@ -95,7 +97,7 @@ fun HalfTablet(
             }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowUp,
-                    contentDescription = "KeyboardArrowUp"
+                    contentDescription = stringResource(id = R.string.keyboard_arrow_up)
                 )
             }
         }
@@ -117,7 +119,7 @@ fun HalfTablet(
             }) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "KeyboardArrowDown"
+                    contentDescription = stringResource(id = R.string.keyboard_arrow_up)
                 )
             }
         }

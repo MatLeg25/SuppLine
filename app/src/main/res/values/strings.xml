@@ -3,4 +3,6 @@
     <string name="snooze">Snooze</string>
     <string name="channel_description">SuppLine App notifications</string>
     <string name="toggle_consumed_state">Toggle consumed state</string>
+    <string name="keyboard_arrow_up">Keyboard Arrow Up</string>
+    <string name="keyboard_arrow_down">Keyboard Arrow Down</string>
 </resources>
