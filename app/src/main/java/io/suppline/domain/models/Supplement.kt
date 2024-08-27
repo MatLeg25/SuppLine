@@ -7,4 +7,5 @@ data class Supplement(
     val name: String,
     val consumed: Boolean,
     val timeToConsume: LocalTime,
+    val hasNotification: Boolean
 )

@@ -5,4 +5,5 @@ data class SupplementDb(
     val name: String,
     val consumed: Boolean,
     val timeToConsume: Int,
+    val hasNotification: Boolean
 )

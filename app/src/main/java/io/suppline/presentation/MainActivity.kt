@@ -75,21 +75,14 @@ class MainActivity : ComponentActivity() {
                             showNotification()
                         })
                         Spacer(modifier = Modifier.weight(0.1f))
-                        SetNotificationBtn(
-                            isNotificationActive = false,
-                            setNotification = {
-                                scheduleNotification(
-                                    context = this@MainActivity,
-                                    timeInMillis = System.currentTimeMillis() + 60,
-                                    notificationId = NOTIFICATION_ID
-                                )
-                            }
-                        )
-                        if (state.groupSectionsByTime) GroupByTime(viewModel = viewModel)
-                        else DefaultSections(viewModel = viewModel)
+                        
+                        if (state.groupSectionsByTime) GroupByTime(viewModel = viewModel, setNotification = ::scheduleNotification)
+                        else DefaultSections(viewModel = viewModel, setNotification = ::scheduleNotification)
                         Spacer(modifier = Modifier.height(24.dp))
                         ProgressBar(
-                            modifier = Modifier.fillMaxWidth().height(24.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(24.dp),
                             progress = state.progress
                         )
                     }
@@ -155,7 +148,7 @@ class MainActivity : ComponentActivity() {
         println(">>>> alarm set for $timeInMillis")
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = ACTION_NOTIFICATION
-            putExtra(EXTRA_NOTIFICATION_ID, 0)
+            putExtra(EXTRA_NOTIFICATION_ID, notificationId)
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,

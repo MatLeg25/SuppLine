@@ -9,6 +9,7 @@ fun Supplement.toSupplementDb() = SupplementDb(
     name = this.name,
     consumed = this.consumed,
     timeToConsume = this.timeToConsume.toSecondOfDay(),
+    hasNotification = this.hasNotification
 )
 
 fun SupplementDb.toSupplement() = Supplement(
@@ -16,4 +17,5 @@ fun SupplementDb.toSupplement() = Supplement(
     name = this.name,
     consumed = this.consumed,
     timeToConsume = LocalTime.ofSecondOfDay(this.timeToConsume.toLong()),
+    hasNotification = this.hasNotification
 )

@@ -24,7 +24,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
         when (intent?.action) {
             ACTION_SNOOZE -> {
-                val notificationId = intent.getIntExtra(MainActivity.EXTRA_NOTIFICATION_ID, 0)
+                val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
                 // Handle the snooze action
                 Toast.makeText(
                     context,
@@ -40,8 +40,9 @@ class NotificationReceiver : BroadcastReceiver() {
             }
 
             MainActivity.ACTION_NOTIFICATION -> {
+                val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
                 context?.let {
-                    showNotification(it)
+                    showNotification(it, notificationId)
                 }
             }
 
@@ -49,7 +50,7 @@ class NotificationReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun showNotification(context: Context) {
+    private fun showNotification(context: Context, notificationId: Int) {
         with(context) {
             val notificationManager = NotificationManagerCompat.from(context)
             val snoozeIntent = Intent(this, NotificationReceiver::class.java).apply {
@@ -65,8 +66,8 @@ class NotificationReceiver : BroadcastReceiver() {
 
             val builder = NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("My notification")
-                .setContentText("Hello World!")
+                .setContentTitle("My notification id: $notificationId")
+                .setContentText("Time to consume item with ID=$notificationId")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setContentIntent(snoozePendingIntent)

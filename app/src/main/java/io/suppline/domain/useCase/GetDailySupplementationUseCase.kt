@@ -19,7 +19,8 @@ class GetDailySupplementationUseCase(
                         id = index,
                         name = s,
                         consumed = false,
-                        timeToConsume = LocalTime.now()
+                        timeToConsume = LocalTime.now(),
+                        hasNotification = false
                     )
                 }
             )
