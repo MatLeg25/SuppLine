@@ -41,7 +41,7 @@ import io.suppline.presentation.ui.theme.SuppLineTheme
 class MainActivity : ComponentActivity() {
 
     companion object {
-        const val CHANNEL_ID = "my_channel_id"
+        const val CHANNEL_ID = "DailySupplementationChanel"
         const val ACTION_SNOOZE = "snooze"
         const val EXTRA_NOTIFICATION_ID = "extra_notification_id"
     }
