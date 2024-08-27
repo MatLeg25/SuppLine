@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
     <application
         android:name=".SuppLineApp"
         android:allowBackup="true"
@@ -27,7 +29,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".presentation.broadcastReceiver.NotificationSnoozeBroadcastReceiver" />
+        <receiver android:name=".presentation.broadcastReceiver.NotificationReceiver" />
     </application>
 
 </manifest>

@@ -1,7 +1,9 @@
 package io.suppline.presentation
 
 import android.Manifest
+import android.app.AlarmManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -30,11 +32,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import dagger.hilt.android.AndroidEntryPoint
 import io.suppline.R
-import io.suppline.presentation.broadcastReceiver.NotificationSnoozeBroadcastReceiver
+import io.suppline.presentation.broadcastReceiver.NotificationReceiver
 import io.suppline.presentation.components.DefaultSections
 import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
 import io.suppline.presentation.components.ProgressBar
+import io.suppline.presentation.components.SetNotificationBtn
 import io.suppline.presentation.ui.theme.SuppLineTheme
 
 @AndroidEntryPoint
@@ -42,7 +45,9 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val CHANNEL_ID = "DailySupplementationChanel"
+        const val NOTIFICATION_ID = 1234
         const val ACTION_SNOOZE = "snooze"
+        const val ACTION_NOTIFICATION = "ACTION_NOTIFICATION"
         const val EXTRA_NOTIFICATION_ID = "extra_notification_id"
     }
 
@@ -70,6 +75,16 @@ class MainActivity : ComponentActivity() {
                             showNotification()
                         })
                         Spacer(modifier = Modifier.weight(0.1f))
+                        SetNotificationBtn(
+                            isNotificationActive = false,
+                            setNotification = {
+                                scheduleNotification(
+                                    context = this@MainActivity,
+                                    timeInMillis = System.currentTimeMillis() + 60,
+                                    notificationId = NOTIFICATION_ID
+                                )
+                            }
+                        )
                         if (state.groupSectionsByTime) GroupByTime(viewModel = viewModel)
                         else DefaultSections(viewModel = viewModel)
                         Spacer(modifier = Modifier.height(24.dp))
@@ -98,7 +113,7 @@ class MainActivity : ComponentActivity() {
 
 
     private fun showNotification() {
-        val snoozeIntent = Intent(this, NotificationSnoozeBroadcastReceiver::class.java).apply {
+        val snoozeIntent = Intent(this, NotificationReceiver::class.java).apply {
             action = ACTION_SNOOZE
             putExtra(EXTRA_NOTIFICATION_ID, 0)
         }
@@ -132,8 +147,29 @@ class MainActivity : ComponentActivity() {
                 return@with
             }
             // notificationId is a unique int for each notification that you must define.
-            notify(123, builder.build())
+            notify(NOTIFICATION_ID, builder.build())
         }
+    }
+
+    fun scheduleNotification(context: Context, timeInMillis: Long, notificationId: Int) {
+        println(">>>> alarm set for $timeInMillis")
+        val intent = Intent(context, NotificationReceiver::class.java).apply {
+            action = ACTION_NOTIFICATION
+            putExtra(EXTRA_NOTIFICATION_ID, 0)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            timeInMillis,
+            pendingIntent
+        )
     }
 
 }

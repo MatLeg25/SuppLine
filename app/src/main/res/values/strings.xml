@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">SuppLine</string>
     <string name="snooze">Snooze</string>
+    <string name="set_notification">Set notification</string>
     <string name="channel_description">SuppLine App notifications</string>
     <string name="toggle_consumed_state">Toggle consumed state</string>
     <string name="keyboard_arrow_up">Keyboard Arrow Up</string>
