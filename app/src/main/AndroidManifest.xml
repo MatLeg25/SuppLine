@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".SuppLineApp"
         android:allowBackup="true"
@@ -25,6 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".presentation.broadcastReceiver.NotificationSnoozeBroadcastReceiver" />
     </application>
 
 </manifest>
