@@ -16,12 +16,14 @@ import javax.inject.Inject
 class SuppLineViewModel @Inject constructor(
     private val getSupplementation: GetDailySupplementationUseCase,
     private val saveSupplementation: SaveDailySupplementationUseCase,
+    private val preferences: Preferences,
 ) : ViewModel() {
 
     private var _state = mutableStateOf(SuppLineState())
     val state: State<SuppLineState> = _state
 
     init {
+        preferences.clear()
         fetchData()
     }
 

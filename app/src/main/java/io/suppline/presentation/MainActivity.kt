@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,12 +17,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dagger.hilt.android.AndroidEntryPoint
+import io.suppline.presentation.components.DefaultSections
+import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
 import io.suppline.presentation.components.ProgressBar
+import io.suppline.presentation.components.Section
 import io.suppline.presentation.components.Supplement
 import io.suppline.presentation.ui.theme.SuppLineTheme
 
@@ -46,33 +52,16 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Logo()
                         Spacer(modifier = Modifier.weight(0.1f))
-                        LazyColumn(modifier = Modifier.weight(0.9f)) {
-
-                            itemsIndexed(state.supplements) { index, item ->
-                                if (index == 0) HorizontalDivider()
-                                Supplement(
-                                    modifier = Modifier,
-                                    model = item,
-                                    isEditable = state.isEditMode,
-                                    onClick = { viewModel.toggleConsumed(item) },
-                                    toggleEditMode = { viewModel.toggleEditMode() },
-                                    setConsumedTime = viewModel::setConsumedTime,
-                                )
-                                HorizontalDivider()
-                            }
-
-                            item {
-                                Spacer(modifier = Modifier.height(24.dp))
-                                ProgressBar(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(24.dp),
-                                    progress = state.progress
-                                )
-                            }
-                        }
+                        if (state.groupSectionsByTime) GroupByTime(viewModel = viewModel)
+                        else DefaultSections(viewModel = viewModel)
+                        Spacer(modifier = Modifier.height(24.dp))
+                        ProgressBar(
+                            modifier = Modifier.fillMaxWidth().height(24.dp),
+                            progress = state.progress
+                        )
                     }
                 }
+
             }
         }
     }
