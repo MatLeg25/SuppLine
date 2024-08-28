@@ -53,6 +53,9 @@ android {
 
 dependencies {
 
+    //Google fonts
+    implementation(libs.androidx.ui.text.google.fonts)
+
     //Dagger - Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)

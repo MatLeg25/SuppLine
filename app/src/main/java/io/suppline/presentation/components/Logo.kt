@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,12 +19,13 @@ import io.suppline.R
 @Composable
 fun Logo(modifier: Modifier = Modifier) {
     Row(
-        modifier = modifier.fillMaxWidth().height(48.dp).background(Color.Gray),
+        modifier = modifier.fillMaxWidth().height(48.dp).background(MaterialTheme.colorScheme.primary),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = stringResource(id = R.string.app_name),
+            color = MaterialTheme.colorScheme.tertiary,
             fontSize = 22.sp
         )
     }

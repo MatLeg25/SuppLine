@@ -78,16 +78,19 @@ fun HalfTablet(
     setConsumedTime: (model: Supplement, hourDelta: Int, minDelta: Int) -> Unit
 ) {
     val shape: RoundedCornerShape
-    val color: Color
+    val backgroundColor: Color
+    val fontColor: Color
     val alignment: Alignment
 
     if (isLeftSide) {
         shape = RoundedCornerShape(height / 2, 0.dp, 0.dp, height / 2)
-        color = MaterialTheme.colorScheme.primary
+        backgroundColor = MaterialTheme.colorScheme.outlineVariant
+        fontColor = MaterialTheme.colorScheme.onPrimary
         alignment = Alignment.CenterEnd
     } else {
         shape = RoundedCornerShape(0.dp, height / 2, height / 2, 0.dp)
-        color = MaterialTheme.colorScheme.secondary
+        backgroundColor = MaterialTheme.colorScheme.inversePrimary
+        fontColor = MaterialTheme.colorScheme.onPrimary
         alignment = Alignment.CenterStart
     }
 
@@ -106,11 +109,12 @@ fun HalfTablet(
             modifier = Modifier
                 .size(height)
                 .clip(shape = shape)
-                .background(color = color),
+                .background(color = backgroundColor),
             contentAlignment = alignment
         ) {
             Text(
                 text = String.format(Locale.ROOT, "%02d", time),
+                color = fontColor,
                 fontSize = (height / 2).value.sp
             )
         }
