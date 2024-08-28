@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.suppline.R
 import io.suppline.domain.models.Supplement
+import java.util.Locale
 
 @Composable
 fun ConsumeTime(
@@ -109,7 +110,7 @@ fun HalfTablet(
             contentAlignment = alignment
         ) {
             Text(
-                text = time.toString(),
+                text = String.format(Locale.ROOT, "%02d", time),
                 fontSize = (height / 2).value.sp
             )
         }
