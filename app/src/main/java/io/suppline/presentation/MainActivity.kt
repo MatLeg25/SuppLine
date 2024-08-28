@@ -110,7 +110,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun initPermissionLauncher() {
+    private fun initPermissionLauncher() { //todo update permission handling
         permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
@@ -162,7 +162,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun scheduleNotification(context: Context, timeInMillis: Long, notificationId: Int) {
+    private fun scheduleNotification(context: Context, timeInMillis: Long, notificationId: Int) { //todo pass more data to notification
         val pendingIntent = getNotificationIntent(context, notificationId)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.setAndAllowWhileIdle(
