@@ -162,19 +162,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun scheduleNotification(context: Context, timeInMillis: Long, notificationId: Int) {
-        println(">>>> alarm set for $timeInMillis, notificationId=$notificationId")
-        val intent = Intent(context, NotificationReceiver::class.java).apply {
-            action = ACTION_NOTIFICATION
-            putExtra(EXTRA_NOTIFICATION_ID, notificationId)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            notificationId,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
+    private fun scheduleNotification(context: Context, timeInMillis: Long, notificationId: Int) {
+        val pendingIntent = getNotificationIntent(context, notificationId)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
@@ -183,8 +172,18 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    fun cancelScheduledNotification(context: Context, notificationId: Int) {
-        // Create the same intent that was used to schedule the notification
+    private fun cancelScheduledNotification(context: Context, notificationId: Int) {
+        // get the same intent that was used to schedule the notification
+        val pendingIntent = getNotificationIntent(context, notificationId)
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(pendingIntent)
+        // Cancel the notification if it has already been shown
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(notificationId)
+    }
+
+    private fun getNotificationIntent(context: Context, notificationId: Int): PendingIntent {
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = ACTION_NOTIFICATION
             putExtra(EXTRA_NOTIFICATION_ID, notificationId)
@@ -195,14 +194,7 @@ class MainActivity : ComponentActivity() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.cancel(pendingIntent)
-
-        // Cancel the notification if it has already been shown
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(notificationId)
+        return pendingIntent
     }
 
 }
