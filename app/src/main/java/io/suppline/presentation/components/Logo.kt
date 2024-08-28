@@ -25,8 +25,9 @@ fun Logo(modifier: Modifier = Modifier) {
     ) {
         Text(
             text = stringResource(id = R.string.app_name),
-            color = MaterialTheme.colorScheme.tertiary,
-            fontSize = 22.sp
+            color = MaterialTheme.colorScheme.inversePrimary,
+            fontSize = 96.sp,
+            style = MaterialTheme.typography.titleLarge
         )
     }
 }
