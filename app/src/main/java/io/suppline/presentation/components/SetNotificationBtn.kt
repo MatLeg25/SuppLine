@@ -13,11 +13,13 @@ import io.suppline.R
 @Composable
 fun SetNotificationBtn(
     modifier: Modifier = Modifier,
+    isEnabled: Boolean,
     isNotificationActive: Boolean,
     setNotification: () -> Unit
 ) {
     IconButton(
         modifier = modifier,
+        enabled = isEnabled,
         onClick = { setNotification() }
     ) {
         Icon(

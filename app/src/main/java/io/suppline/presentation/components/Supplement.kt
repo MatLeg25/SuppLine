@@ -52,6 +52,7 @@ fun Supplement(
                 setConsumedTime = setConsumedTime
             )
             SetNotificationBtn(
+                isEnabled = isEditable,
                 isNotificationActive = model.hasNotification,
                 setNotification = { setNotification(model) }
             )
