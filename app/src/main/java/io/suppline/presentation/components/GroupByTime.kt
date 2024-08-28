@@ -17,7 +17,7 @@ fun GroupByTime(
 
     sectionsMap.forEach { (hour, supplements) ->
         Section(header = hour.toString()) {
-            LazyColumn(modifier = Modifier) {
+            LazyColumn(modifier = modifier) {
                 itemsIndexed(supplements) { index, item ->
                     if (index == 0) HorizontalDivider()
                     Supplement(

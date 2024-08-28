@@ -90,12 +90,9 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Logo(modifier = Modifier.clickable {
-                            showNotification()
-                        })
-                        Spacer(modifier = Modifier.weight(0.1f))
-                        if (state.groupSectionsByTime) GroupByTime(viewModel = viewModel)
-                        else DefaultSections(viewModel = viewModel)
+                        Logo(modifier = Modifier)
+                        if (state.groupSectionsByTime) GroupByTime(modifier = Modifier.weight(1f), viewModel = viewModel)
+                        else DefaultSections(modifier = Modifier.weight(1f), viewModel = viewModel)
                         Spacer(modifier = Modifier.height(24.dp))
                         ProgressBar(
                             modifier = Modifier
