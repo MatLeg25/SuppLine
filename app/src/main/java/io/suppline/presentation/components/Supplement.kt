@@ -1,6 +1,5 @@
 package io.suppline.presentation.components
 
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -13,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.suppline.domain.models.Supplement
-import java.time.LocalTime
 
 @Composable
 fun Supplement(
@@ -23,7 +21,7 @@ fun Supplement(
     onClick: () -> Unit,
     toggleEditMode: () -> Unit,
     setConsumedTime: (supplement: Supplement, hourDelta: Int, minDelta: Int) -> Unit,
-    setNotification: (context: Context, timeInMillis: Long, notificationId: Int) -> Unit
+    setNotification: (supplement: Supplement) -> Unit
 ) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
@@ -54,10 +52,8 @@ fun Supplement(
                 setConsumedTime = setConsumedTime
             )
             SetNotificationBtn(
-                isNotificationActive = false,
-                notificationTimeInMillis = model.timeToConsume.toSecondOfDay() * 1000L,
-                notificationId = model.id,
-                setNotification = setNotification
+                isNotificationActive = model.hasNotification,
+                setNotification = { setNotification(model) }
             )
         }
 

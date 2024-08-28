@@ -3,6 +3,7 @@ package io.suppline.presentation
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.models.Supplement
@@ -10,6 +11,10 @@ import io.suppline.domain.preferences.Preferences
 import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import io.suppline.domain.utils.validators.TimeValidator
+import io.suppline.presentation.models.Notification
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +26,9 @@ class SuppLineViewModel @Inject constructor(
 
     private var _state = mutableStateOf(SuppLineState())
     val state: State<SuppLineState> = _state
+
+    private var _updateNotification: MutableStateFlow<Notification?> = MutableStateFlow(null)
+    val updateNotification: StateFlow<Notification?> = _updateNotification
 
     init {
         preferences.clear()
@@ -69,7 +77,6 @@ class SuppLineViewModel @Inject constructor(
             if (!isEditMode) state.value.supplements.sortedBy { it.timeToConsume }
             else state.value.supplements
         )
-
     }
 
     fun setConsumedTime(supplement: Supplement, hourDelta: Int, minDelta: Int) {
@@ -88,6 +95,25 @@ class SuppLineViewModel @Inject constructor(
             _state.value = copy(supplements = list)
         }
         saveChanges()
+    }
+
+    fun setNotification(supplement: Supplement) {
+        with(state.value) {
+            val list = supplements.toMutableList()
+            val indexToReplace = list.indexOf(supplement)
+            if (indexToReplace in 0..list.lastIndex) {
+                list[indexToReplace] = supplement.copy(hasNotification = !supplement.hasNotification)
+            }
+            _state.value = copy(supplements = list)
+            viewModelScope.launch {
+                _updateNotification.emit(
+                    Notification(
+                        id = supplement.id,
+                        timeInMillis = supplement.timeToConsume.toSecondOfDay() * 1000L
+                    )
+                )
+            }
+        }
     }
 
     private fun saveChanges() {

@@ -1,6 +1,5 @@
 package io.suppline.presentation.components
 
-import android.content.Context
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
@@ -11,8 +10,7 @@ import io.suppline.presentation.SuppLineViewModel
 @Composable
 fun GroupByTime(
     modifier: Modifier = Modifier,
-    viewModel: SuppLineViewModel,
-    setNotification: (context: Context, timeInMillis: Long, notificationId: Int) -> Unit
+    viewModel: SuppLineViewModel
 ) {
     val state = viewModel.state.value
     val sectionsMap = state.getSupplementsByHours()
@@ -29,7 +27,7 @@ fun GroupByTime(
                         onClick = { viewModel.toggleConsumed(item) },
                         toggleEditMode = { viewModel.toggleEditMode() },
                         setConsumedTime = viewModel::setConsumedTime,
-                        setNotification = setNotification
+                        setNotification = viewModel::setNotification
                     )
                     HorizontalDivider()
                 }

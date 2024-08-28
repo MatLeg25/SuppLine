@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.suppline.R
 import io.suppline.presentation.broadcastReceiver.NotificationReceiver
@@ -37,8 +38,9 @@ import io.suppline.presentation.components.DefaultSections
 import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
 import io.suppline.presentation.components.ProgressBar
-import io.suppline.presentation.components.SetNotificationBtn
 import io.suppline.presentation.ui.theme.SuppLineTheme
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -59,6 +61,18 @@ class MainActivity : ComponentActivity() {
 
         initPermissionLauncher()
 
+        lifecycleScope.launch {
+            viewModel.updateNotification.collectLatest {
+                it?.let {
+                    scheduleNotification(
+                        context = this@MainActivity,
+                        timeInMillis = it.timeInMillis,
+                        notificationId = it.id
+                    )
+                }
+            }
+        }
+
         enableEdgeToEdge()
         setContent {
             SuppLineTheme {
@@ -75,9 +89,8 @@ class MainActivity : ComponentActivity() {
                             showNotification()
                         })
                         Spacer(modifier = Modifier.weight(0.1f))
-                        
-                        if (state.groupSectionsByTime) GroupByTime(viewModel = viewModel, setNotification = ::scheduleNotification)
-                        else DefaultSections(viewModel = viewModel, setNotification = ::scheduleNotification)
+                        if (state.groupSectionsByTime) GroupByTime(viewModel = viewModel)
+                        else DefaultSections(viewModel = viewModel)
                         Spacer(modifier = Modifier.height(24.dp))
                         ProgressBar(
                             modifier = Modifier
@@ -145,7 +158,7 @@ class MainActivity : ComponentActivity() {
     }
 
     fun scheduleNotification(context: Context, timeInMillis: Long, notificationId: Int) {
-        println(">>>> alarm set for $timeInMillis")
+        println(">>>> alarm set for $timeInMillis, notificationId=$notificationId")
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = ACTION_NOTIFICATION
             putExtra(EXTRA_NOTIFICATION_ID, notificationId)
