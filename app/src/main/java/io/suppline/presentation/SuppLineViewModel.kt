@@ -98,18 +98,20 @@ class SuppLineViewModel @Inject constructor(
     }
 
     fun setNotification(supplement: Supplement) {
+        val newState = !supplement.hasNotification
         with(state.value) {
             val list = supplements.toMutableList()
             val indexToReplace = list.indexOf(supplement)
             if (indexToReplace in 0..list.lastIndex) {
-                list[indexToReplace] = supplement.copy(hasNotification = !supplement.hasNotification)
+                list[indexToReplace] = supplement.copy(hasNotification = newState)
             }
             _state.value = copy(supplements = list)
             viewModelScope.launch {
                 _updateNotification.emit(
                     Notification(
                         id = supplement.id,
-                        timeInMillis = supplement.timeToConsume.toSecondOfDay() * 1000L
+                        timeInMillis = supplement.timeToConsume.toSecondOfDay() * 1000L,
+                        active = newState
                     )
                 )
             }

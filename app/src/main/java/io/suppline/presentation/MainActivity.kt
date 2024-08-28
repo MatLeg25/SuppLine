@@ -2,6 +2,7 @@ package io.suppline.presentation
 
 import android.Manifest
 import android.app.AlarmManager
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -62,11 +63,15 @@ class MainActivity : ComponentActivity() {
         initPermissionLauncher()
 
         lifecycleScope.launch {
-            viewModel.updateNotification.collectLatest {
-                it?.let {
-                    scheduleNotification(
+            viewModel.updateNotification.collectLatest { notification ->
+                notification?.let {
+                    if (it.active) scheduleNotification(
                         context = this@MainActivity,
                         timeInMillis = it.timeInMillis,
+                        notificationId = it.id
+                    )
+                    else cancelScheduledNotification(
+                        context = this@MainActivity,
                         notificationId = it.id
                     )
                 }
@@ -176,6 +181,28 @@ class MainActivity : ComponentActivity() {
             timeInMillis,
             pendingIntent
         )
+    }
+
+    fun cancelScheduledNotification(context: Context, notificationId: Int) {
+        // Create the same intent that was used to schedule the notification
+        val intent = Intent(context, NotificationReceiver::class.java).apply {
+            action = ACTION_NOTIFICATION
+            putExtra(EXTRA_NOTIFICATION_ID, notificationId)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            notificationId,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(pendingIntent)
+
+        // Cancel the notification if it has already been shown
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(notificationId)
     }
 
 }
