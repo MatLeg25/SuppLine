@@ -53,6 +53,9 @@ android {
 
 dependencies {
 
+    //Splash screen
+    implementation(libs.androidx.core.splashscreen)
+
     //Google fonts
     implementation(libs.androidx.ui.text.google.fonts)
 
