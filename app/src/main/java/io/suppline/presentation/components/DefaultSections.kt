@@ -17,7 +17,8 @@ import io.suppline.presentation.SuppLineViewModel
 fun DefaultSections(
     modifier: Modifier = Modifier,
     supplements: List<Supplement>,
-    viewModel: SuppLineViewModel
+    viewModel: SuppLineViewModel,
+    hasNotificationsPermission: Boolean
 ) {
     val state = viewModel.state.value
 
@@ -35,7 +36,8 @@ fun DefaultSections(
                 onClick = { viewModel.toggleConsumed(item) },
                 toggleEditMode = { viewModel.toggleEditMode(index) },
                 setConsumedTime = viewModel::setConsumedTime,
-                setNotification = viewModel::setNotification
+                setNotification = viewModel::setNotification,
+                hasNotificationsPermission = hasNotificationsPermission
             )
             HorizontalDivider()
             AnimatedVisibility(visible = isEditable) {

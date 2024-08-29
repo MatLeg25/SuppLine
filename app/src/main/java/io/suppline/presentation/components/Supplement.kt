@@ -21,7 +21,8 @@ fun Supplement(
     onClick: () -> Unit,
     toggleEditMode: () -> Unit,
     setConsumedTime: (supplement: Supplement, hourDelta: Int, minDelta: Int) -> Unit,
-    setNotification: (supplement: Supplement) -> Unit
+    setNotification: (hasPermission: Boolean, supplement: Supplement) -> Unit,
+    hasNotificationsPermission: Boolean
 ) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
@@ -54,7 +55,7 @@ fun Supplement(
             SetNotificationBtn(
                 isEnabled = isEditable,
                 isNotificationActive = model.hasNotification,
-                setNotification = { setNotification(model) }
+                setNotification = { setNotification(hasNotificationsPermission, model) }
             )
         }
 

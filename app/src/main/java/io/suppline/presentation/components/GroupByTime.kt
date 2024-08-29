@@ -7,14 +7,20 @@ import io.suppline.presentation.SuppLineViewModel
 @Composable
 fun GroupByTime(
     modifier: Modifier = Modifier,
-    viewModel: SuppLineViewModel
+    viewModel: SuppLineViewModel,
+    hasNotificationsPermission: Boolean
 ) {
     val state = viewModel.state.value
     val sectionsMap = state.getSupplementsByHours()
 
     sectionsMap.forEach { (hour, supplements) ->
         Section(header = hour.toString()) {
-            DefaultSections(modifier = modifier, supplements = supplements, viewModel = viewModel)
+            DefaultSections(
+                modifier = modifier,
+                supplements = supplements,
+                viewModel = viewModel,
+                hasNotificationsPermission = hasNotificationsPermission
+            )
         }
     }
 

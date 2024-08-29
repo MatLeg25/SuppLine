@@ -12,8 +12,11 @@ import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import io.suppline.domain.utils.validators.TimeValidator
 import io.suppline.presentation.models.Notification
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import io.suppline.presentation.states.NotificationState
+import io.suppline.presentation.states.SuppLineState
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,8 +30,11 @@ class SuppLineViewModel @Inject constructor(
     private var _state = mutableStateOf(SuppLineState())
     val state: State<SuppLineState> = _state
 
-    private var _updateNotification: MutableStateFlow<Notification?> = MutableStateFlow(null)
-    val updateNotification: StateFlow<Notification?> = _updateNotification
+    private var _updateNotification: MutableSharedFlow<NotificationState?> = MutableSharedFlow(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    val updateNotification: SharedFlow<NotificationState?> = _updateNotification
 
     init {
         preferences.clear()
@@ -74,8 +80,8 @@ class SuppLineViewModel @Inject constructor(
             editedItemIndex = index.takeIf { it != state.value.editedItemIndex },
             //when user left editMode, update items order
             supplements =
-                if (index != null) state.value.supplements.sortedBy { it.timeToConsume }
-                else state.value.supplements
+            if (index != null) state.value.supplements.sortedBy { it.timeToConsume }
+            else state.value.supplements
         )
     }
 
@@ -97,21 +103,34 @@ class SuppLineViewModel @Inject constructor(
         saveChanges()
     }
 
-    fun setNotification(supplement: Supplement) {
-        val newState = !supplement.hasNotification
-        with(state.value) {
-            val list = supplements.toMutableList()
-            val indexToReplace = list.indexOf(supplement)
-            if (indexToReplace in 0..list.lastIndex) {
-                list[indexToReplace] = supplement.copy(hasNotification = newState)
-            }
-            _state.value = copy(supplements = list)
-            viewModelScope.launch {
+    fun setNotification(hasPermission: Boolean, supplement: Supplement) {
+        viewModelScope.launch {
+            if (hasPermission) {
+                val newState = !supplement.hasNotification
+                with(state.value) {
+                    val list = supplements.toMutableList()
+                    val indexToReplace = list.indexOf(supplement)
+                    if (indexToReplace in 0..list.lastIndex) {
+                        list[indexToReplace] = supplement.copy(hasNotification = newState)
+                    }
+                    _state.value = copy(supplements = list)
+
+                    _updateNotification.emit(
+                        NotificationState(
+                            notification = Notification(
+                                id = supplement.id,
+                                timeInMillis = supplement.timeToConsume.toSecondOfDay() * 1000L,
+                                active = newState,
+                            ),
+                            hasNotificationsPermission = true
+                        )
+                    )
+                }
+            } else {
                 _updateNotification.emit(
-                    Notification(
-                        id = supplement.id,
-                        timeInMillis = supplement.timeToConsume.toSecondOfDay() * 1000L,
-                        active = newState
+                    NotificationState(
+                        notification = null,
+                        hasNotificationsPermission = false
                     )
                 )
             }

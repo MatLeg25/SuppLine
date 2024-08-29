@@ -1,4 +1,4 @@
-package io.suppline.presentation
+package io.suppline.presentation.states
 
 import io.suppline.domain.models.Supplement
 import java.time.LocalDate

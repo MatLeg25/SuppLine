@@ -16,7 +16,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,8 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,21 +58,28 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
-
         initPermissionLauncher()
 
         lifecycleScope.launch {
-            viewModel.updateNotification.collectLatest { notification ->
-                notification?.let {
-                    if (it.active) scheduleNotification(
-                        context = this@MainActivity,
-                        timeInMillis = it.timeInMillis,
-                        notificationId = it.id
-                    )
-                    else cancelScheduledNotification(
-                        context = this@MainActivity,
-                        notificationId = it.id
-                    )
+            viewModel.apply {
+                updateNotification.collectLatest { notificationState ->
+                    notificationState?.let {
+                        if (notificationState.hasNotificationsPermission) {
+                            notificationState.notification?.let {
+                                if (it.active) scheduleNotification(
+                                    context = this@MainActivity,
+                                    timeInMillis = it.timeInMillis,
+                                    notificationId = it.id
+                                )
+                                else cancelScheduledNotification(
+                                    context = this@MainActivity,
+                                    notificationId = it.id
+                                )
+                            }
+                        } else {
+                            askNotificationsPermission()
+                        }
+                    }
                 }
             }
         }
@@ -93,11 +97,16 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Logo(modifier = Modifier)
-                        if (state.groupSectionsByTime) GroupByTime(modifier = Modifier.weight(1f), viewModel = viewModel)
+                        if (state.groupSectionsByTime) GroupByTime(
+                            modifier = Modifier.weight(1f),
+                            viewModel = viewModel,
+                            hasNotificationsPermission = hasNotificationsPermission()
+                        )
                         else DefaultSections(
                             modifier = Modifier.weight(1f),
                             supplements = state.supplements,
-                            viewModel = viewModel
+                            viewModel = viewModel,
+                            hasNotificationsPermission = hasNotificationsPermission()
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         ProgressBar(
@@ -113,55 +122,34 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun initPermissionLauncher() { //todo update permission handling
+    private fun initPermissionLauncher() {
         permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-            if (isGranted) {
-                showNotification()
-            } else {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+            if (!isGranted) {
+                Toast.makeText(
+                    this,
+                    this.getString(R.string.permission_denied),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
 
-
-    private fun showNotification() {
-        val snoozeIntent = Intent(this, NotificationReceiver::class.java).apply {
-            action = ACTION_SNOOZE
-            putExtra(EXTRA_NOTIFICATION_ID, 0)
+    private fun hasNotificationsPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            (ActivityCompat.checkSelfPermission(
+                this@MainActivity,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED)
+        } else {
+            true
         }
-        val snoozePendingIntent: PendingIntent = PendingIntent.getBroadcast(
-            this, 0, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+    }
 
-        val builder = NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("My notification")
-            .setContentText("Hello World!")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setContentIntent(snoozePendingIntent)
-            .addAction(
-                R.drawable.ic_launcher_background, getString(R.string.snooze),
-                snoozePendingIntent
-            )
-            .setAutoCancel(true)
-
-        with(NotificationManagerCompat.from(this)) {
-            if (ActivityCompat.checkSelfPermission(
-                    this@MainActivity,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                }
-
-                return@with
-            }
-            // notificationId is a unique int for each notification that you must define.
-            notify(NOTIFICATION_ID, builder.build())
+    private fun askNotificationsPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
