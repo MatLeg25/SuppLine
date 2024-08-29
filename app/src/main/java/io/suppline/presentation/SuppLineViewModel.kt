@@ -68,14 +68,14 @@ class SuppLineViewModel @Inject constructor(
         saveChanges()
     }
 
-    fun toggleEditMode() {
-        val isEditMode = !state.value.isEditMode
+    fun toggleEditMode(index: Int?) {
         _state.value = state.value.copy(
-            isEditMode = isEditMode,
+            // if current editedItemIndex is equal to index = turn off edit mode
+            editedItemIndex = index.takeIf { it != state.value.editedItemIndex },
             //when user left editMode, update items order
             supplements =
-            if (!isEditMode) state.value.supplements.sortedBy { it.timeToConsume }
-            else state.value.supplements
+                if (index != null) state.value.supplements.sortedBy { it.timeToConsume }
+                else state.value.supplements
         )
     }
 

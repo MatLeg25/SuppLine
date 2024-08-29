@@ -20,9 +20,9 @@ fun DefaultSections(
             Supplement(
                 modifier = Modifier,
                 model = item,
-                isEditable = state.isEditMode,
+                isEditable = (state.editedItemIndex == index),
                 onClick = { viewModel.toggleConsumed(item) },
-                toggleEditMode = { viewModel.toggleEditMode() },
+                toggleEditMode = { viewModel.toggleEditMode(index) },
                 setConsumedTime = viewModel::setConsumedTime,
                 setNotification = viewModel::setNotification
             )
