@@ -1,8 +1,5 @@
 package io.suppline.presentation.components
 
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.suppline.presentation.SuppLineViewModel
@@ -17,21 +14,7 @@ fun GroupByTime(
 
     sectionsMap.forEach { (hour, supplements) ->
         Section(header = hour.toString()) {
-            LazyColumn(modifier = modifier) {
-                itemsIndexed(supplements) { index, item ->
-                    if (index == 0) HorizontalDivider()
-                    Supplement(
-                        modifier = Modifier,
-                        model = item,
-                        isEditable = (state.editedItemIndex == index),
-                        onClick = { viewModel.toggleConsumed(item) },
-                        toggleEditMode = { viewModel.toggleEditMode(index) },
-                        setConsumedTime = viewModel::setConsumedTime,
-                        setNotification = viewModel::setNotification
-                    )
-                    HorizontalDivider()
-                }
-            }
+            DefaultSections(modifier = modifier, supplements = supplements, viewModel = viewModel)
         }
     }
 

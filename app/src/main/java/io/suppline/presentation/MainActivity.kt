@@ -94,7 +94,11 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Logo(modifier = Modifier)
                         if (state.groupSectionsByTime) GroupByTime(modifier = Modifier.weight(1f), viewModel = viewModel)
-                        else DefaultSections(modifier = Modifier.weight(1f), viewModel = viewModel)
+                        else DefaultSections(
+                            modifier = Modifier.weight(1f),
+                            supplements = state.supplements,
+                            viewModel = viewModel
+                        )
                         Spacer(modifier = Modifier.height(24.dp))
                         ProgressBar(
                             modifier = Modifier
@@ -161,7 +165,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun scheduleNotification(context: Context, timeInMillis: Long, notificationId: Int) { //todo pass more data to notification
+    private fun scheduleNotification(
+        context: Context,
+        timeInMillis: Long,
+        notificationId: Int
+    ) { //todo pass more data to notification
         val pendingIntent = getNotificationIntent(context, notificationId)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.setAndAllowWhileIdle(
