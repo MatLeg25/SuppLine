@@ -6,6 +6,7 @@ import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.preferences.Preferences
 import io.suppline.domain.utils.serializer.DailySupplementationDeserializer
 import io.suppline.domain.utils.serializer.DailySupplementationSerializer
+import java.time.LocalDate
 
 
 class DefaultPreferences(
@@ -35,9 +36,26 @@ class DefaultPreferences(
     override fun loadDailySupplements(): DailySupplementation? {
         val supplementationJson = sharedPref.getString(Preferences.KEY_DAILY_SUPPLEMENTS, null)
         return if (supplementationJson != null) {
-            gson.fromJson(supplementationJson, DailySupplementation::class.java)
+            val supplementation: DailySupplementation? = gson.fromJson(supplementationJson, DailySupplementation::class.java)
+            supplementation?.let {
+                getForToday(it)
+            }
         } else {
             null
         }
     }
+
+    private fun getForToday(supplementation: DailySupplementation): DailySupplementation {
+        val today = LocalDate.now()
+        val isToday = supplementation.date.isEqual(today)
+        return if (isToday) supplementation else {
+            supplementation.copy(
+                date = today,
+                supplements = supplementation.supplements.map { supplement ->
+                    supplement.copy(consumed = false)
+                }
+            )
+        }
+    }
+
 }
