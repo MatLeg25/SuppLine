@@ -37,7 +37,6 @@ class SuppLineViewModel @Inject constructor(
     val updateNotification: SharedFlow<NotificationState?> = _updateNotification
 
     init {
-        preferences.clear()
         fetchData()
     }
 

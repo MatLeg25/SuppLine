@@ -13,7 +13,7 @@ class GetDailySupplementationUseCase(
     operator fun invoke(): DailySupplementation {
         return preferences.loadDailySupplements() ?: kotlin.run {
             DailySupplementation(
-                date = LocalDate.now().plusDays(9),
+                date = LocalDate.now(),
                 supplements = Config.DEFAULT_SUPPLEMENT_NAMES.mapIndexed { index, s ->
                     Supplement(
                         id = index,
