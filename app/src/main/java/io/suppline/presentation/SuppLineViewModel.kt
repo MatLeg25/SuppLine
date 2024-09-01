@@ -10,6 +10,7 @@ import io.suppline.domain.models.Supplement
 import io.suppline.domain.preferences.Preferences
 import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
+import io.suppline.domain.utils.extensions.localTimeToEpochMillis
 import io.suppline.domain.utils.validators.TimeValidator
 import io.suppline.presentation.models.Notification
 import io.suppline.presentation.states.NotificationState
@@ -114,11 +115,14 @@ class SuppLineViewModel @Inject constructor(
                     }
                     _state.value = copy(supplements = list)
 
+                    val t = supplement.timeToConsume.localTimeToEpochMillis()
+                    println(">>>>> t = $t")
+
                     _updateNotification.emit(
                         NotificationState(
                             notification = Notification(
                                 id = supplement.id,
-                                timeInMillis = supplement.timeToConsume.toSecondOfDay() * 1000L,
+                                timeInMillis = t,
                                 active = newState,
                             ),
                             hasNotificationsPermission = true
