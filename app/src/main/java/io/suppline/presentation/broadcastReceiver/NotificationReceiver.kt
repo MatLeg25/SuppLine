@@ -86,7 +86,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 requestCode = 0,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
                     action = ACTION_SNOOZE
-                    putExtra(EXTRA_NOTIFICATION_ID, 0)
+                    putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 },
             )
 
@@ -95,7 +95,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 requestCode = 1,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
                     action = ACTION_DONE
-                    putExtra(EXTRA_NOTIFICATION_ID, 1)
+                    putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 },
             )
 
@@ -104,7 +104,7 @@ class NotificationReceiver : BroadcastReceiver() {
                 requestCode = 2,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
                     action = ACTION_CANCEL
-                    putExtra(EXTRA_NOTIFICATION_ID, 2)
+                    putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 },
             )
 
