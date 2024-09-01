@@ -104,8 +104,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.weight(1f),
                             viewModel = viewModel,
                             hasNotificationsPermission = hasNotificationsPermission()
-                        )
-                        else DefaultSections(
+                        ) else DefaultSections(
                             modifier = Modifier.weight(1f),
                             supplements = state.supplements,
                             viewModel = viewModel,
