@@ -21,17 +21,20 @@ fun DefaultSections(
     hasNotificationsPermission: Boolean
 ) {
     val state = viewModel.state.value
-    val sortedSupplements = supplements.sortedBy { it.timeToConsume }
+    val isEditMode = (state.editedItemIndex != null)
+    //prevent item moving when user is editing timeConsumed
+    val items = if (isEditMode) supplements else supplements.sortedBy { it.timeToConsume }
 
     LazyColumn(modifier = modifier) {
-        itemsIndexed(sortedSupplements) { index, item ->
+        itemsIndexed(items) { index, item ->
             if (index == 0) HorizontalDivider()
             val isEditable = (state.editedItemIndex == index)
             AnimatedVisibility(visible = isEditable) {
                 HorizontalDivider(
                     Modifier
                         .height(24.dp)
-                        .background(Color.Transparent))
+                        .background(Color.Transparent)
+                )
             }
             Supplement(
                 modifier = Modifier,
@@ -48,7 +51,8 @@ fun DefaultSections(
                 HorizontalDivider(
                     Modifier
                         .height(24.dp)
-                        .background(Color.Transparent))
+                        .background(Color.Transparent)
+                )
             }
         }
     }
