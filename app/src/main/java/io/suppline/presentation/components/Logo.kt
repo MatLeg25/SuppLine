@@ -10,6 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,18 +23,24 @@ import io.suppline.R
 @Preview
 fun Logo(modifier: Modifier = Modifier) {
     val fontSize = 96.sp
-    
+    val colorInt1 = LocalContext.current.getColor(R.color.purple_200)
+    val colorInt2 = LocalContext.current.getColor(R.color.purple_500)
+    val colorInt3 = LocalContext.current.getColor(R.color.purple_700)
+    val backgroundColor = Brush.verticalGradient(
+        listOf(Color(colorInt3), Color(colorInt2), Color(colorInt1))
+    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(fontSize.value.dp)
-            .background(MaterialTheme.colorScheme.primary),
+            .background(backgroundColor),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = stringResource(id = R.string.suppline_title),
-            color = MaterialTheme.colorScheme.inversePrimary,
+            color = Color.White,
             fontSize = fontSize,
             style = MaterialTheme.typography.titleLarge,
             letterSpacing = 1.sp,
