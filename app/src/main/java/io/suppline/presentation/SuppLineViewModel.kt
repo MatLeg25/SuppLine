@@ -115,19 +115,18 @@ class SuppLineViewModel @Inject constructor(
                     }
                     _state.value = copy(supplements = list)
 
-                    val t = supplement.timeToConsume.localTimeToEpochMillis()
-                    println(">>>>> t = $t")
-
                     _updateNotification.emit(
                         NotificationState(
                             notification = Notification(
                                 id = supplement.id,
-                                timeInMillis = t,
+                                name = supplement.name,
+                                timeInMillis = supplement.timeToConsume.localTimeToEpochMillis(),
                                 active = newState,
                             ),
                             hasNotificationsPermission = true
                         )
                     )
+
                 }
             } else {
                 _updateNotification.emit(

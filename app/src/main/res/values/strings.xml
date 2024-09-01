@@ -2,6 +2,10 @@
     <string name="app_name">SuppLine</string>
     <string name="suppline_title">SuppLinE</string>
     <string name="snooze">Snooze</string>
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+    <string name="suppline_X">SuppLine [%1$d]</string>
+    <string name="time_to_consume_X">Time to consume: %1$s</string>
     <string name="set_notification">Set notification</string>
     <string name="channel_description">SuppLine App notifications</string>
     <string name="toggle_consumed_state">Toggle consumed state</string>

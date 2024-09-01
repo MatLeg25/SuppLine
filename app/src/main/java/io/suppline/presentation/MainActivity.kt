@@ -37,6 +37,7 @@ import io.suppline.presentation.components.DefaultSections
 import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
 import io.suppline.presentation.components.ProgressBar
+import io.suppline.presentation.models.Notification
 import io.suppline.presentation.ui.theme.SuppLineTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -48,8 +49,11 @@ class MainActivity : ComponentActivity() {
         const val CHANNEL_ID = "DailySupplementationChanel"
         const val NOTIFICATION_ID = 1234
         const val ACTION_SNOOZE = "snooze"
+        const val ACTION_DONE = "done"
+        const val ACTION_CANCEL = "cancel"
         const val ACTION_NOTIFICATION = "ACTION_NOTIFICATION"
-        const val EXTRA_NOTIFICATION_ID = "extra_notification_id"
+        const val EXTRA_NOTIFICATION_ID = "EXTRA_NOTIFICATION_ID"
+        const val EXTRA_NOTIFICATION_NAME = "EXTRA_NOTIFICATION_NAME"
     }
 
     private val viewModel: SuppLineViewModel by viewModels()
@@ -68,12 +72,11 @@ class MainActivity : ComponentActivity() {
                             notificationState.notification?.let {
                                 if (it.active) scheduleNotification(
                                     context = this@MainActivity,
-                                    timeInMillis = it.timeInMillis,
-                                    notificationId = it.id
+                                    notification = it
                                 )
                                 else cancelScheduledNotification(
                                     context = this@MainActivity,
-                                    notificationId = it.id
+                                    notification = it
                                 )
                             }
                         } else {
@@ -153,39 +156,36 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun scheduleNotification(
-        context: Context,
-        timeInMillis: Long,
-        notificationId: Int
-    ) { //todo pass more data to notification
-        val pendingIntent = getNotificationIntent(context, notificationId)
+    private fun scheduleNotification(context: Context, notification: Notification) {
+        val pendingIntent = getNotificationIntent(context, notification)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
-            timeInMillis,
+            System.currentTimeMillis() + 3000,//timeInMillis, //todo update
             pendingIntent
         )
     }
 
-    private fun cancelScheduledNotification(context: Context, notificationId: Int) {
+    private fun cancelScheduledNotification(context: Context, notification: Notification) {
         // get the same intent that was used to schedule the notification
-        val pendingIntent = getNotificationIntent(context, notificationId)
+        val pendingIntent = getNotificationIntent(context, notification)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(pendingIntent)
         // Cancel the notification if it has already been shown
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(notificationId)
+        notificationManager.cancel(notification.id)
     }
 
-    private fun getNotificationIntent(context: Context, notificationId: Int): PendingIntent {
+    private fun getNotificationIntent(context: Context, notification: Notification): PendingIntent {
         val intent = Intent(context, NotificationReceiver::class.java).apply {
             action = ACTION_NOTIFICATION
-            putExtra(EXTRA_NOTIFICATION_ID, notificationId)
+            putExtra(EXTRA_NOTIFICATION_ID, notification.id)
+            putExtra(EXTRA_NOTIFICATION_NAME, notification.name)
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            notificationId,
+            notification.id,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
