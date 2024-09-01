@@ -28,10 +28,12 @@ class NotificationReceiver : BroadcastReceiver() {
         when (intent?.action) {
 
             MainActivity.ACTION_NOTIFICATION -> {
-                val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
-                val notificationName = intent.getStringExtra(EXTRA_NOTIFICATION_NAME) ?: ""
                 context?.let {
-                    showNotification(it, notificationId, notificationName)
+                    showNotification(
+                        context = it,
+                        notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1),
+                        notificationName = intent.getStringExtra(EXTRA_NOTIFICATION_NAME) ?: ""
+                    )
                 }
             }
 
