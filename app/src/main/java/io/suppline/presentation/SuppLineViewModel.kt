@@ -136,6 +136,7 @@ class SuppLineViewModel @Inject constructor(
                     )
                 )
             }
+            saveChanges()
         }
     }
 
