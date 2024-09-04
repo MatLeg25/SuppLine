@@ -7,8 +7,9 @@ data class SuppLineState(
     val date: LocalDate = LocalDate.now(),
     val supplements: List<Supplement> = emptyList(),
     val progress: Float = 0f,
-    val editedItemIndex: Int? = null,
+    val configItemIndex: Int? = null,
     val groupSectionsByTime: Boolean = false,
+    val editedItem: Supplement? = null
 ) {
     fun getSupplementsByHours(): Map<Int, List<Supplement>> {
         return supplements.groupBy {

@@ -23,9 +23,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -101,11 +104,18 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Logo(modifier = Modifier)
-                        if (state.editedItemIndex != null) {
+                        //todo extract code to Screen fun
+                        if (state.editedItem != null) {
                             AddEditItem(
                                 modifier = Modifier,
                                 viewmodel = viewModel
                             )
+                        } else {
+                            IconButton(onClick = {
+                                viewModel.setEditedItem()
+                            }) {
+                                Text(text = stringResource(id = R.string.name))
+                            }
                         }
                         if (state.groupSectionsByTime) GroupByTime(
                             modifier = Modifier.weight(1f),

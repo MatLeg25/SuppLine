@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.models.Supplement
-import io.suppline.domain.preferences.Preferences
 import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import io.suppline.domain.utils.extensions.localTimeToEpochMillis
@@ -55,57 +54,37 @@ class SuppLineViewModel @Inject constructor(
     override fun onEvent(event: AddEditSupplementEvent) {
         when (event) {
             is AddEditSupplementEvent.OnNameChange -> {
-                val supplement = event.supplement
-
-                val list = state.value.supplements.toMutableList()
-                val index = list.indexOf(supplement)
-                list[index] = supplement.copy(name = event.name)
-
                 _state.value = state.value.copy(
-                    supplements = list
+                    editedItem = event.supplement.copy(name = event.name)
                 )
             }
 
             is AddEditSupplementEvent.OnDescriptionChange -> {
-                val supplement = event.supplement
-
-                val list = state.value.supplements.toMutableList()
-                val index = list.indexOf(supplement)
-                list[index] = supplement.copy(description = event.description)
-
                 _state.value = state.value.copy(
-                    supplements = list
+                    editedItem = event.supplement.copy(description = event.description)
                 )
             }
         }
     }
 
     override fun getEditedItem(): Supplement {
-        val index = state.value.editedItemIndex
-        val editedItem = index?.let {
-            state.value.supplements.getOrNull(it)
-        }
-        //get or create new supplement
-        return editedItem!!
+        return state.value.editedItem!!
     }
 
-    private fun addSupplement(): Supplement {
-        val supplement = Supplement(
-            id = state.value.supplements.size,
+    fun setEditedItem(supplement: Supplement? = null) {
+        //set given or default
+        val _supplement = supplement ?: Supplement(
+            id = -1,
             name = "",
             description = "",
             consumed = false,
             timeToConsume = LocalTime.now(),
             hasNotification = false
         )
-        val updatedList = state.value.supplements.toMutableList()
-        updatedList.add(supplement)
 
         _state.value = state.value.copy(
-            supplements = updatedList
+            editedItem = _supplement
         )
-
-        return supplement
     }
 
     private fun setProgress() {
@@ -134,7 +113,7 @@ class SuppLineViewModel @Inject constructor(
     fun toggleEditMode(index: Int?) {
         _state.value = state.value.copy(
             // if current editedItemIndex is equal to index = turn off edit mode
-            editedItemIndex = index.takeIf { it != state.value.editedItemIndex },
+            configItemIndex = index.takeIf { it != state.value.configItemIndex },
             //when user left editMode, update items order
             supplements =
             if (index != null) state.value.supplements.sortedBy { it.timeToConsume }
