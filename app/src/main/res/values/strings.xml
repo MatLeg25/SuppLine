@@ -5,6 +5,8 @@
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
     <string name="name">Name</string>
+    <string name="name_cannot_be_empty">Name cannot be empty</string>
+    <string name="accept">Accept</string>
     <string name="description">Description</string>
     <string name="optional">Optional</string>
     <string name="suppline_X">SuppLine [%1$d]</string>

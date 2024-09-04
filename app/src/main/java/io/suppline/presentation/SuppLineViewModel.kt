@@ -64,6 +64,25 @@ class SuppLineViewModel @Inject constructor(
                     editedItem = event.supplement.copy(description = event.description)
                 )
             }
+
+            is AddEditSupplementEvent.Accept -> {
+                val updatedItem = state.value.editedItem!!
+
+                val index = state.value.supplements.indexOfFirst { it.id == updatedItem.id }
+
+                if (index == -1) addSupplement(updatedItem)
+                else Unit // todo replaceSupplement()
+
+                _state.value = state.value.copy(
+                    editedItem = null
+                )
+            }
+
+            is AddEditSupplementEvent.Reject -> {
+                _state.value = state.value.copy(
+                    editedItem = null
+                )
+            }
         }
     }
 
@@ -84,6 +103,14 @@ class SuppLineViewModel @Inject constructor(
 
         _state.value = state.value.copy(
             editedItem = _supplement
+        )
+    }
+
+    private fun addSupplement(supplement: Supplement) {
+        val list = state.value.supplements.toMutableList()
+        list.add(supplement)
+        _state.value = state.value.copy(
+            supplements = list
         )
     }
 

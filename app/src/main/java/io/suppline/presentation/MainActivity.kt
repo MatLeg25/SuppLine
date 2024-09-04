@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity() {
                         if (state.editedItem != null) {
                             AddEditItem(
                                 modifier = Modifier,
-                                viewmodel = viewModel
+                                viewModel = viewModel
                             )
                         } else {
                             IconButton(onClick = {
