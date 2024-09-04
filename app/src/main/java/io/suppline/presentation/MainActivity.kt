@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.suppline.R
 import io.suppline.presentation.broadcastReceiver.NotificationReceiver
+import io.suppline.presentation.components.AddEditItem
 import io.suppline.presentation.components.DefaultSections
 import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
@@ -100,6 +101,12 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Logo(modifier = Modifier)
+                        if (state.editedItemIndex != null) {
+                            AddEditItem(
+                                modifier = Modifier,
+                                viewmodel = viewModel
+                            )
+                        }
                         if (state.groupSectionsByTime) GroupByTime(
                             modifier = Modifier.weight(1f),
                             viewModel = viewModel,

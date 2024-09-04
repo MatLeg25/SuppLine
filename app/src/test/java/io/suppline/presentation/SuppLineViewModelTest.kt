@@ -20,6 +20,7 @@ class SuppLineViewModelTest() {
         Supplement(
             id = 1,
             name = "One",
+            description = "description-One",
             consumed = false,
             timeToConsume = LocalTime.of(11,0),
             hasNotification = false
@@ -27,6 +28,7 @@ class SuppLineViewModelTest() {
         Supplement(
             id = 2,
             name = "Two",
+            description = "description-Two",
             consumed = false,
             timeToConsume = LocalTime.of(12,0),
             hasNotification = false
@@ -34,6 +36,7 @@ class SuppLineViewModelTest() {
         Supplement(
             id = 3,
             name = "Three",
+            description = "description-Three",
             consumed = false,
             timeToConsume = LocalTime.of(13,0),
             hasNotification = false

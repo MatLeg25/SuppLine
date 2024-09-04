@@ -12,6 +12,7 @@ import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import io.suppline.domain.utils.extensions.localTimeToEpochMillis
 import io.suppline.domain.utils.validators.TimeValidator
+import io.suppline.presentation.events.AddEditSupplementEvent
 import io.suppline.presentation.models.Notification
 import io.suppline.presentation.states.NotificationState
 import io.suppline.presentation.states.SuppLineState
@@ -19,14 +20,14 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
 class SuppLineViewModel @Inject constructor(
     private val getSupplementation: GetDailySupplementationUseCase,
-    private val saveSupplementation: SaveDailySupplementationUseCase,
-    private val preferences: Preferences,
-) : ViewModel() {
+    private val saveSupplementation: SaveDailySupplementationUseCase
+) : ViewModel(), SuppLineViewModelContract {
 
     private var _state = mutableStateOf(SuppLineState())
     val state: State<SuppLineState> = _state
@@ -49,6 +50,62 @@ class SuppLineViewModel @Inject constructor(
             supplements = supplementation.supplements
         )
         setProgress()
+    }
+
+    override fun onEvent(event: AddEditSupplementEvent) {
+        when (event) {
+            is AddEditSupplementEvent.OnNameChange -> {
+                val supplement = event.supplement
+
+                val list = state.value.supplements.toMutableList()
+                val index = list.indexOf(supplement)
+                list[index] = supplement.copy(name = event.name)
+
+                _state.value = state.value.copy(
+                    supplements = list
+                )
+            }
+
+            is AddEditSupplementEvent.OnDescriptionChange -> {
+                val supplement = event.supplement
+
+                val list = state.value.supplements.toMutableList()
+                val index = list.indexOf(supplement)
+                list[index] = supplement.copy(description = event.description)
+
+                _state.value = state.value.copy(
+                    supplements = list
+                )
+            }
+        }
+    }
+
+    override fun getEditedItem(): Supplement {
+        val index = state.value.editedItemIndex
+        val editedItem = index?.let {
+            state.value.supplements.getOrNull(it)
+        }
+        //get or create new supplement
+        return editedItem!!
+    }
+
+    private fun addSupplement(): Supplement {
+        val supplement = Supplement(
+            id = state.value.supplements.size,
+            name = "",
+            description = "",
+            consumed = false,
+            timeToConsume = LocalTime.now(),
+            hasNotification = false
+        )
+        val updatedList = state.value.supplements.toMutableList()
+        updatedList.add(supplement)
+
+        _state.value = state.value.copy(
+            supplements = updatedList
+        )
+
+        return supplement
     }
 
     private fun setProgress() {

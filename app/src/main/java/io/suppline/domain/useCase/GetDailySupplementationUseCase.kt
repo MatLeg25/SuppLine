@@ -37,6 +37,7 @@ class GetDailySupplementationUseCase(
                 Supplement(
                     id = index,
                     name = s,
+                    description = "",
                     consumed = false,
                     timeToConsume = LocalTime.now(),
                     hasNotification = false

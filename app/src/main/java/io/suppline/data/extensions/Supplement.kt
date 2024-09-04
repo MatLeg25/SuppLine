@@ -7,6 +7,7 @@ import java.time.LocalTime
 fun Supplement.toSupplementDb() = SupplementDb(
     id = this.id,
     name = this.name,
+    description = this.description,
     consumed = this.consumed,
     timeToConsume = this.timeToConsume.toSecondOfDay(),
     hasNotification = this.hasNotification
@@ -15,6 +16,7 @@ fun Supplement.toSupplementDb() = SupplementDb(
 fun SupplementDb.toSupplement() = Supplement(
     id = this.id,
     name = this.name,
+    description = this.description,
     consumed = this.consumed,
     timeToConsume = LocalTime.ofSecondOfDay(this.timeToConsume.toLong()),
     hasNotification = this.hasNotification

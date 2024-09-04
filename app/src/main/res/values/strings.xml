@@ -4,6 +4,9 @@
     <string name="snooze">Snooze</string>
     <string name="done">Done</string>
     <string name="cancel">Cancel</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+    <string name="optional">Optional</string>
     <string name="suppline_X">SuppLine [%1$d]</string>
     <string name="time_to_consume_X">Time to consume: %1$s</string>
     <string name="set_notification">Set notification</string>
