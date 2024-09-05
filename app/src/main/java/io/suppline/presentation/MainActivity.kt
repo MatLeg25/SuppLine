@@ -16,18 +16,28 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -36,6 +46,7 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.suppline.R
 import io.suppline.presentation.broadcastReceiver.NotificationReceiver
+import io.suppline.presentation.components.AddEditBtn
 import io.suppline.presentation.components.AddEditItem
 import io.suppline.presentation.components.DefaultSections
 import io.suppline.presentation.components.GroupByTime
@@ -104,18 +115,33 @@ class MainActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
                         Logo(modifier = Modifier)
-                        //todo extract code to Screen fun
+                        //todo extract code to Screen composable fun
                         if (state.editedItem != null) {
                             AddEditItem(
                                 modifier = Modifier,
                                 viewModel = viewModel
                             )
                         } else {
-                            IconButton(onClick = {
-                                viewModel.setEditedItem()
-                            }) {
-                                Text(text = stringResource(id = R.string.name))
+                            val addText = stringResource(id = R.string.add)
+                            val editText = stringResource(id = R.string.edit)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                AddEditBtn(
+                                    modifier = Modifier.padding(8.dp),
+                                    text = addText,
+                                    imageVector = Icons.Default.Add,
+                                    onClick = { viewModel.setEditedItem() },
+                                )
+                                AddEditBtn(
+                                    modifier = Modifier.padding(8.dp),
+                                    text = editText,
+                                    imageVector = Icons.Default.Edit,
+                                    onClick = { viewModel.setEditedItem() },
+                                )
                             }
+
                         }
                         if (state.groupSectionsByTime) GroupByTime(
                             modifier = Modifier.weight(1f),
