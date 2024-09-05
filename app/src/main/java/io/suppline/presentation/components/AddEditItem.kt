@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +24,8 @@ import io.suppline.R
 import io.suppline.presentation.SuppLineViewModelContract
 import io.suppline.presentation.events.AddEditSupplementEvent
 
+
+//TODO update UI (add text for buttons, consider move this feature to bottom modal)
 @Composable
 fun AddEditItem(
     modifier: Modifier = Modifier,
@@ -31,6 +34,10 @@ fun AddEditItem(
     val supplement = viewModel.getEditedItem()
     var isError by remember {
         mutableStateOf(false)
+    }
+
+    fun validateName() {
+        isError = supplement.name.isBlank()
     }
 
     Column(modifier = modifier) {
@@ -45,7 +52,7 @@ fun AddEditItem(
                     },
                     value = supplement.name,
                     onValueChange = {
-                        isError = it.isBlank()
+                        validateName()
                         viewModel.onEvent(
                             event = AddEditSupplementEvent.OnNameChange(
                                 supplement = supplement,
@@ -78,32 +85,33 @@ fun AddEditItem(
             }
         }
         Row {
-            IconButton(onClick = {
-                if (!isError) {
-                    viewModel.onEvent(
-                        event = AddEditSupplementEvent.Accept
-                    )
-                }
-            }) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = stringResource(id = R.string.accept)
-                )
-            }
-            IconButton(onClick = {
-                viewModel.onEvent(
-                    event = AddEditSupplementEvent.Reject
-                )
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Clear,
-                    contentDescription = stringResource(id = R.string.cancel)
-                )
-            }
             ActionButton(
                 modifier = Modifier.padding(8.dp),
-                text = stringResource(id = R.string.remove),
-                imageVector = Icons.Default.Edit,
+                text = "", //stringResource(id = R.string.add),
+                imageVector = Icons.Default.CheckCircle,
+                onClick = {
+                    validateName()
+                    if (!isError) {
+                        viewModel.onEvent(
+                            event = AddEditSupplementEvent.Accept
+                        )
+                    }
+                },
+            )
+            ActionButton(
+                modifier = Modifier.padding(8.dp),
+                text = "", //stringResource(id = R.string.cancel),
+                imageVector = Icons.Default.Clear,
+                onClick = {
+                    viewModel.onEvent(
+                        event = AddEditSupplementEvent.Reject
+                    )
+                },
+            )
+            ActionButton(
+                modifier = Modifier.padding(8.dp),
+                text = "", //stringResource(id = R.string.remove),
+                imageVector = Icons.Default.Delete,
                 onClick = {
                     viewModel.onEvent(
                         event = AddEditSupplementEvent.OnRemove(supplement)

@@ -120,14 +120,8 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 ActionButton(
                                     modifier = Modifier.padding(8.dp),
-                                    text = stringResource(id = R.string.add),
+                                    text = stringResource(id = R.string.add_supplement),
                                     imageVector = Icons.Default.Add,
-                                    onClick = { viewModel.setEditedItem() },
-                                )
-                                ActionButton(
-                                    modifier = Modifier.padding(8.dp),
-                                    text = stringResource(id = R.string.edit),
-                                    imageVector = Icons.Default.Edit,
                                     onClick = { viewModel.setEditedItem() },
                                 )
                             }
