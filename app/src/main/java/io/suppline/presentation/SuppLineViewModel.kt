@@ -65,6 +65,14 @@ class SuppLineViewModel @Inject constructor(
                 )
             }
 
+            is AddEditSupplementEvent.OnRemove -> {
+                removeSupplement(event.supplement)
+                _state.value = state.value.copy(
+                    editedItem = null,
+                    configItemIndex = null
+                )
+            }
+
             is AddEditSupplementEvent.Accept -> {
                 val updatedItem = state.value.editedItem!!
 
@@ -112,6 +120,21 @@ class SuppLineViewModel @Inject constructor(
             supplements = list
         )
         setProgress()
+    }
+
+    fun removeSupplement(supplement: Supplement) {
+        val list = state.value.supplements.toMutableList()
+        list.remove(supplement)
+        _state.value = state.value.copy(
+            supplements = list
+        )
+        setProgress()
+    }
+
+    fun onEditClick(supplement: Supplement) {
+        _state.value = state.value.copy(
+            editedItem = supplement
+        )
     }
 
     private fun setProgress() {

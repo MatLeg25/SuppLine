@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AddEditBtn(
+fun ActionButton(
     modifier: Modifier = Modifier,
     text: String,
     imageVector: ImageVector,
@@ -21,7 +21,7 @@ fun AddEditBtn(
     OutlinedButton(
         onClick = onClick,
         border = BorderStroke(1.dp, Color.Red),
-        modifier = Modifier.padding(8.dp)
+        modifier = modifier
     ) {
         Icon(
             imageVector = imageVector,

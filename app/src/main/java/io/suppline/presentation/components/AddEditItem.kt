@@ -2,9 +2,11 @@ package io.suppline.presentation.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -16,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import io.suppline.R
 import io.suppline.presentation.SuppLineViewModelContract
 import io.suppline.presentation.events.AddEditSupplementEvent
@@ -97,6 +100,16 @@ fun AddEditItem(
                     contentDescription = stringResource(id = R.string.cancel)
                 )
             }
+            ActionButton(
+                modifier = Modifier.padding(8.dp),
+                text = stringResource(id = R.string.remove),
+                imageVector = Icons.Default.Edit,
+                onClick = {
+                    viewModel.onEvent(
+                        event = AddEditSupplementEvent.OnRemove(supplement)
+                    )
+                },
+            )
         }
 
 

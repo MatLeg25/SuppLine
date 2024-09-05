@@ -41,6 +41,7 @@ fun DefaultSections(
                 model = item,
                 isEditable = isEditable,
                 onClick = { viewModel.toggleConsumed(item) },
+                onEditClick = viewModel::onEditClick,
                 toggleEditMode = { viewModel.toggleEditMode(index) },
                 setConsumedTime = viewModel::setConsumedTime,
                 setNotification = viewModel::setNotification,
