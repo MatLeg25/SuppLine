@@ -78,7 +78,7 @@ class SuppLineViewModel @Inject constructor(
 
                 val index = state.value.supplements.indexOfFirst { it.id == updatedItem.id }
                 if (index == -1) addSupplement(updatedItem)
-                else Unit // todo replaceSupplement()
+                else updateSupplement(updatedItem)
 
                 _state.value = state.value.copy(
                     editedItem = null
@@ -91,6 +91,9 @@ class SuppLineViewModel @Inject constructor(
                 )
             }
         }
+
+        setProgress()
+        saveChanges()
     }
 
     override fun getEditedItem(): Supplement {
@@ -119,16 +122,29 @@ class SuppLineViewModel @Inject constructor(
         _state.value = state.value.copy(
             supplements = list
         )
-        setProgress()
     }
 
-    fun removeSupplement(supplement: Supplement) {
+    private fun updateSupplement(supplement: Supplement) {
+        val itemToUpdate = state.value.supplements.find { it.id == supplement.id }
+        itemToUpdate?.let {
+            val index = state.value.supplements.indexOf(itemToUpdate)
+            val list = state.value.supplements.toMutableList()
+            list[index] = itemToUpdate.copy(
+                name = supplement.name,
+                description = supplement.description
+            )
+            _state.value = state.value.copy(
+                supplements = list
+            )
+        }
+    }
+
+    private fun removeSupplement(supplement: Supplement) {
         val list = state.value.supplements.toMutableList()
         list.remove(supplement)
         _state.value = state.value.copy(
             supplements = list
         )
-        setProgress()
     }
 
     fun onEditClick(supplement: Supplement) {
