@@ -16,6 +16,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -107,12 +108,11 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Logo(modifier = Modifier)
                         //todo extract code to Screen composable fun
-                        if (state.editedItem != null) {
-                            AddEditItem(
-                                modifier = Modifier,
-                                viewModel = viewModel
-                            )
-                        } else {
+                        val isAddEditMode = (state.editedItem != null)
+                        AnimatedVisibility(visible = isAddEditMode) {
+                            AddEditItem(modifier = Modifier, viewModel = viewModel)
+                        }
+                        if (!isAddEditMode) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.Center

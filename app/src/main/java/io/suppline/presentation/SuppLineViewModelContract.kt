@@ -5,5 +5,5 @@ import io.suppline.presentation.events.AddEditSupplementEvent
 
 interface SuppLineViewModelContract {
     fun onEvent(event: AddEditSupplementEvent)
-    fun getEditedItem(): Supplement
+    fun getEditedItem(): Supplement?
 }

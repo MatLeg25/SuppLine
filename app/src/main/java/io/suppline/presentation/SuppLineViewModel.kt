@@ -96,8 +96,8 @@ class SuppLineViewModel @Inject constructor(
         saveChanges()
     }
 
-    override fun getEditedItem(): Supplement {
-        return state.value.editedItem!!
+    override fun getEditedItem(): Supplement? {
+        return state.value.editedItem
     }
 
     fun setEditedItem(supplement: Supplement? = null) {

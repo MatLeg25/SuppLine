@@ -28,7 +28,7 @@ fun AddEditItem(
     modifier: Modifier = Modifier,
     viewModel: SuppLineViewModelContract
 ) {
-    val supplement = viewModel.getEditedItem()
+    val supplement = viewModel.getEditedItem() ?: return
     var isError by remember {
         mutableStateOf(false)
     }
