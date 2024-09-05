@@ -69,7 +69,6 @@ class SuppLineViewModel @Inject constructor(
                 val updatedItem = state.value.editedItem!!
 
                 val index = state.value.supplements.indexOfFirst { it.id == updatedItem.id }
-
                 if (index == -1) addSupplement(updatedItem)
                 else Unit // todo replaceSupplement()
 
@@ -108,10 +107,11 @@ class SuppLineViewModel @Inject constructor(
 
     private fun addSupplement(supplement: Supplement) {
         val list = state.value.supplements.toMutableList()
-        list.add(supplement)
+        list.add(supplement.copy(id = list.size))
         _state.value = state.value.copy(
             supplements = list
         )
+        setProgress()
     }
 
     private fun setProgress() {
