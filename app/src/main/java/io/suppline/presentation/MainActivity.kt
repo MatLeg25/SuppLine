@@ -183,9 +183,10 @@ class MainActivity : ComponentActivity() {
     private fun scheduleNotification(context: Context, notification: Notification) {
         val pendingIntent = getNotificationIntent(context, notification)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setAndAllowWhileIdle(
+        alarmManager.setRepeating(
             AlarmManager.RTC_WAKEUP,
             notification.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
     }
