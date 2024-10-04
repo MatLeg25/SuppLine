@@ -93,7 +93,8 @@ class MainActivity : ComponentActivity() {
                             notificationState.notification?.let {
                                 if (it.active) scheduleNotification(
                                     context = this@MainActivity,
-                                    notification = it
+                                    notification = it,
+                                    notificationState.isDailyNotification
                                 )
                                 else cancelScheduledNotification(
                                     context = this@MainActivity,
@@ -194,8 +195,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun scheduleNotification(context: Context, notification: Notification) {
-        println(">>>>>>>>>>scheduleNotification: $notification ")
+    private fun scheduleNotification(
+        context: Context,
+        notification: Notification,
+        isDaily: Boolean
+    ) {
+        println(">>>>>>>>>>scheduleNotification: $notification : $isDaily ")
+        val type = if (isDaily) AlarmManager.INTERVAL_DAY else AlarmManager.INTERVAL_DAY
         val pendingIntent = getNotificationIntent(context, notification)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.setExact(

@@ -49,8 +49,7 @@ class SuppLineViewModel @Inject constructor(
         //fetch from preferences or create new based on default
         val supplementation = getSupplementation()
         _state.value = state.value.copy(
-            date = supplementation.date,
-            supplements = supplementation.supplements
+            date = supplementation.date, supplements = supplementation.supplements
         )
         setProgress()
     }
@@ -72,8 +71,7 @@ class SuppLineViewModel @Inject constructor(
             is AddEditSupplementEvent.OnRemove -> {
                 removeSupplement(event.supplement)
                 _state.value = state.value.copy(
-                    editedItem = null,
-                    configItemIndex = null
+                    editedItem = null, configItemIndex = null
                 )
             }
 
@@ -134,8 +132,7 @@ class SuppLineViewModel @Inject constructor(
             val index = state.value.supplements.indexOf(itemToUpdate)
             val list = state.value.supplements.toMutableList()
             list[index] = itemToUpdate.copy(
-                name = supplement.name,
-                description = supplement.description
+                name = supplement.name, description = supplement.description
             )
             _state.value = state.value.copy(
                 supplements = list
@@ -159,11 +156,9 @@ class SuppLineViewModel @Inject constructor(
 
     private fun setProgress() {
         with(state.value) {
-            _state.value = copy(
-                progress = if (supplements.isNotEmpty()) {
-                    (supplements.count { it.consumed } / supplements.size.toFloat())
-                } else 0f
-            )
+            _state.value = copy(progress = if (supplements.isNotEmpty()) {
+                (supplements.count { it.consumed } / supplements.size.toFloat())
+            } else 0f)
         }
     }
 
@@ -185,10 +180,8 @@ class SuppLineViewModel @Inject constructor(
             // if current editedItemIndex is equal to index = turn off edit mode
             configItemIndex = index.takeIf { it != state.value.configItemIndex },
             //when user left editMode, update items order
-            supplements =
-            if (index != null) state.value.supplements.sortedBy { it.timeToConsume }
-            else state.value.supplements
-        )
+            supplements = if (index != null) state.value.supplements.sortedBy { it.timeToConsume }
+            else state.value.supplements)
     }
 
     fun setConsumedTime(supplement: Supplement, hourDelta: Int, minDelta: Int) {
@@ -198,9 +191,7 @@ class SuppLineViewModel @Inject constructor(
             if (indexToReplace in 0..list.lastIndex) {
                 list[indexToReplace] = supplement.copy(
                     timeToConsume = TimeValidator.validateTime(
-                        time = supplement.timeToConsume,
-                        hourDelta = hourDelta,
-                        minDelta = minDelta
+                        time = supplement.timeToConsume, hourDelta = hourDelta, minDelta = minDelta
                     )
                 )
             }
@@ -209,6 +200,7 @@ class SuppLineViewModel @Inject constructor(
         saveChanges()
     }
 
+    //todo refactor hasNotificationsPermission
     fun setNotification(hasPermission: Boolean, supplement: Supplement) {
         viewModelScope.launch {
             if (hasPermission) {
@@ -228,8 +220,7 @@ class SuppLineViewModel @Inject constructor(
                                 name = supplement.name,
                                 timeInMillis = supplement.timeToConsume.localTimeToEpochMillis(),
                                 active = newState,
-                            ),
-                            hasNotificationsPermission = true
+                            ), hasNotificationsPermission = true, isDailyNotification = true
                         )
                     )
 
@@ -238,7 +229,8 @@ class SuppLineViewModel @Inject constructor(
                 _updateNotification.emit(
                     NotificationState(
                         notification = null,
-                        hasNotificationsPermission = false
+                        hasNotificationsPermission = false,
+                        isDailyNotification = true
                     )
                 )
             }
@@ -258,6 +250,27 @@ class SuppLineViewModel @Inject constructor(
             val responseAction = NotificationResponseAction.fromInt(
                 it.getIntExtra(EXTRA_RESPONSE_ACTION_INT, -1)
             )
+            when (responseAction) {
+                NotificationResponseAction.SNOOZE -> viewModelScope.launch {
+                    val supplement = state.value.supplements.first { it.id == notificationId }
+                    _updateNotification.emit(
+                        NotificationState(
+                            notification = Notification(
+                                id = supplement.id,
+                                name = supplement.name,
+                                timeInMillis = supplement.timeToConsume.plusMinutes(15).localTimeToEpochMillis(),
+                                active = true,
+                            ), hasNotificationsPermission = true, isDailyNotification = false
+                        )
+                    )
+                }
+
+                NotificationResponseAction.DONE -> toggleConsumed(supplement = state.value.supplements.first { it.id == notificationId })
+
+                NotificationResponseAction.CANCEL -> Unit
+                else -> Unit
+            }
+
             println(">>>>>>>>>>> action -> onResponse == $notificationId, $responseAction")
         }
 

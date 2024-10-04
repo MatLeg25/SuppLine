@@ -140,6 +140,8 @@ class NotificationReceiver : BroadcastReceiver() {
             Toast.LENGTH_SHORT
         ).show()
         context?.let {
+            val notificationManager = NotificationManagerCompat.from(context)
+            notificationManager.cancel(NOTIFICATION_ID)
             val localIntent = Intent(NOTIFICATION_RESPONSE).apply {
                 putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 putExtra(EXTRA_RESPONSE_ACTION_INT, responseAction.value)
