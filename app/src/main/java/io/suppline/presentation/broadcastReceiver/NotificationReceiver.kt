@@ -63,6 +63,13 @@ class NotificationReceiver : BroadcastReceiver() {
         with(context) {
             val notificationManager = NotificationManagerCompat.from(context)
 
+            val contentIntent: PendingIntent = PendingIntent.getActivity(
+                this,
+                123,
+                Intent(this, MainActivity::class.java),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
             val snoozePendingIntent: PendingIntent = getPendingIntent(
                 context = this,
                 requestCode = NotificationResponseAction.SNOOZE.value,
@@ -95,7 +102,9 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setContentTitle(getString(R.string.suppline_X, notificationId))
                 .setContentText(getString(R.string.time_to_consume_X, notificationName))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_REMINDER).addAction(
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setContentIntent(contentIntent)
+                .addAction(
                     R.drawable.ic_launcher_background,
                     getString(R.string.snooze),
                     snoozePendingIntent
