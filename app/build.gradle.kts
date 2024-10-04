@@ -69,6 +69,9 @@ dependencies {
     // GSON
     implementation(libs.gson)
 
+    // Local Broadcast Manager
+    implementation(libs.androidx.localbroadcastmanager)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

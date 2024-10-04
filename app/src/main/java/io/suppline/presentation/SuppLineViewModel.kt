@@ -1,5 +1,6 @@
 package io.suppline.presentation
 
+import android.content.Intent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,9 @@ import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import io.suppline.domain.utils.extensions.localTimeToEpochMillis
 import io.suppline.domain.utils.validators.TimeValidator
+import io.suppline.presentation.MainActivity.Companion.EXTRA_NOTIFICATION_ID
+import io.suppline.presentation.MainActivity.Companion.EXTRA_RESPONSE_ACTION_INT
+import io.suppline.presentation.enums.NotificationResponseAction
 import io.suppline.presentation.events.AddEditSupplementEvent
 import io.suppline.presentation.models.Notification
 import io.suppline.presentation.states.NotificationState
@@ -246,6 +250,17 @@ class SuppLineViewModel @Inject constructor(
         saveSupplementation(
             DailySupplementation(state.value.date, state.value.supplements)
         )
+    }
+
+    fun handleBroadcastAction(intent: Intent?) {
+        intent?.let {
+            val notificationId = it.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
+            val responseAction = NotificationResponseAction.fromInt(
+                it.getIntExtra(EXTRA_RESPONSE_ACTION_INT, -1)
+            )
+            println(">>>>>>>>>>> action -> onResponse == $notificationId, $responseAction")
+        }
+
     }
 
 

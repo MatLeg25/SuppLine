@@ -6,74 +6,54 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.suppline.R
 import io.suppline.presentation.MainActivity
-import io.suppline.presentation.MainActivity.Companion.ACTION_CANCEL
-import io.suppline.presentation.MainActivity.Companion.ACTION_DONE
-import io.suppline.presentation.MainActivity.Companion.ACTION_SNOOZE
+import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_CANCEL
+import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_DONE
+import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_SNOOZE
 import io.suppline.presentation.MainActivity.Companion.EXTRA_NOTIFICATION_ID
 import io.suppline.presentation.MainActivity.Companion.EXTRA_NOTIFICATION_NAME
+import io.suppline.presentation.MainActivity.Companion.EXTRA_RESPONSE_ACTION_INT
 import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_ID
+import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_RESPONSE
+import io.suppline.presentation.enums.NotificationResponseAction
 
 class NotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         println(">>>> Recive at: ${System.currentTimeMillis()} , action = ${intent?.action}")
 
-        when (intent?.action) {
+        val notificationId = intent?.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
+        if (notificationId == null || notificationId == -1) return
+
+        when (intent.action) {
 
             MainActivity.ACTION_NOTIFICATION -> {
                 context?.let {
                     showNotification(
                         context = it,
-                        notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1),
+                        notificationId = notificationId,
                         notificationName = intent.getStringExtra(EXTRA_NOTIFICATION_NAME) ?: ""
                     )
                 }
             }
 
-            ACTION_SNOOZE -> {
-                val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
-                // Handle the snooze action
-                Toast.makeText(
-                    context,
-                    "Snooze action triggered for notification ID: $notificationId",
-                    Toast.LENGTH_SHORT
-                ).show()
+            BTN_ACTION_SNOOZE -> handleUserAction(
+                context, notificationId, NotificationResponseAction.SNOOZE
+            )
 
-            }
+            BTN_ACTION_DONE -> handleUserAction(
+                context, notificationId, NotificationResponseAction.DONE
+            )
 
-            ACTION_DONE -> {
-                val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
-                // Handle the snooze action
-                Toast.makeText(
-                    context,
-                    "DONE action triggered for notification ID: $notificationId",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-            }
-
-            ACTION_CANCEL -> {
-                val notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
-                // Handle the snooze action
-                Toast.makeText(
-                    context,
-                    "Cancel action triggered for notification ID: $notificationId",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                // Optionally cancel the notification
-                context?.let {
-                    val notificationManager = NotificationManagerCompat.from(it)
-                    notificationManager.cancel(notificationId)
-                }
-            }
+            BTN_ACTION_CANCEL -> handleUserAction(
+                context, notificationId, NotificationResponseAction.CANCEL
+            )
 
             else -> Unit
         }
@@ -85,27 +65,27 @@ class NotificationReceiver : BroadcastReceiver() {
 
             val snoozePendingIntent: PendingIntent = getPendingIntent(
                 context = this,
-                requestCode = 0,
+                requestCode = NotificationResponseAction.SNOOZE.value,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
-                    action = ACTION_SNOOZE
+                    action = BTN_ACTION_SNOOZE
                     putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 },
             )
 
             val donePendingIntent: PendingIntent = getPendingIntent(
                 context = this,
-                requestCode = 1,
+                requestCode = NotificationResponseAction.DONE.value,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
-                    action = ACTION_DONE
+                    action = BTN_ACTION_DONE
                     putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 },
             )
 
             val cancelPendingIntent: PendingIntent = getPendingIntent(
                 context = this,
-                requestCode = 2,
+                requestCode = NotificationResponseAction.CANCEL.value,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
-                    action = ACTION_CANCEL
+                    action = BTN_ACTION_CANCEL
                     putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 },
             )
@@ -115,25 +95,21 @@ class NotificationReceiver : BroadcastReceiver() {
                 .setContentTitle(getString(R.string.suppline_X, notificationId))
                 .setContentText(getString(R.string.time_to_consume_X, notificationName))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_REMINDER)
-                .addAction(
-                    R.drawable.ic_launcher_background, getString(R.string.snooze),
+                .setCategory(NotificationCompat.CATEGORY_REMINDER).addAction(
+                    R.drawable.ic_launcher_background,
+                    getString(R.string.snooze),
                     snoozePendingIntent
-                )
-                .addAction(
-                    R.drawable.ic_launcher_background, getString(R.string.done),
-                    donePendingIntent
-                )
-                .addAction(
-                    R.drawable.ic_launcher_background, getString(R.string.cancel),
+                ).addAction(
+                    R.drawable.ic_launcher_background, getString(R.string.done), donePendingIntent
+                ).addAction(
+                    R.drawable.ic_launcher_background,
+                    getString(R.string.cancel),
                     cancelPendingIntent
-                )
-                .setAutoCancel(true)
+                ).setAutoCancel(true)
 
 
             if (ActivityCompat.checkSelfPermission(
-                    this@with,
-                    Manifest.permission.POST_NOTIFICATIONS
+                    this@with, Manifest.permission.POST_NOTIFICATIONS
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
                 return@with
@@ -143,13 +119,33 @@ class NotificationReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun getPendingIntent(context: Context, requestCode: Int, intent: Intent): PendingIntent {
+    private fun getPendingIntent(
+        context: Context, requestCode: Int, intent: Intent
+    ): PendingIntent {
         return PendingIntent.getBroadcast(
             context,
             requestCode,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+    }
+
+    private fun handleUserAction(
+        context: Context?, notificationId: Int, responseAction: NotificationResponseAction
+    ) {
+        // Handle the snooze action
+        Toast.makeText(
+            context,
+            "$responseAction action triggered for notification ID: $notificationId",
+            Toast.LENGTH_SHORT
+        ).show()
+        context?.let {
+            val localIntent = Intent(NOTIFICATION_RESPONSE).apply {
+                putExtra(EXTRA_NOTIFICATION_ID, notificationId)
+                putExtra(EXTRA_RESPONSE_ACTION_INT, responseAction.value)
+            }
+            LocalBroadcastManager.getInstance(it).sendBroadcast(localIntent)
+        }
     }
 
 

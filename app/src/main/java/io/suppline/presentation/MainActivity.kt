@@ -4,8 +4,10 @@ import android.Manifest
 import android.app.AlarmManager
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.suppline.R
 import io.suppline.presentation.broadcastReceiver.NotificationReceiver
@@ -55,21 +58,32 @@ class MainActivity : ComponentActivity() {
     companion object {
         const val CHANNEL_ID = "DailySupplementationChanel"
         const val NOTIFICATION_ID = 1234
-        const val ACTION_SNOOZE = "snooze"
-        const val ACTION_DONE = "done"
-        const val ACTION_CANCEL = "cancel"
+        const val BTN_ACTION_SNOOZE = "BTN_ACTION_SNOOZE"
+        const val BTN_ACTION_DONE = "BTN_ACTION_DONE"
+        const val BTN_ACTION_CANCEL = "BTN_ACTION_CANCEL"
         const val ACTION_NOTIFICATION = "ACTION_NOTIFICATION"
         const val EXTRA_NOTIFICATION_ID = "EXTRA_NOTIFICATION_ID"
         const val EXTRA_NOTIFICATION_NAME = "EXTRA_NOTIFICATION_NAME"
+        const val NOTIFICATION_RESPONSE = "NOTIFICATION_RESPONSE"
+        const val EXTRA_RESPONSE_ACTION_INT = "EXTRA_RESPONSE_ACTION_INT"
     }
 
     private val viewModel: SuppLineViewModel by viewModels()
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
+    private val broadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            viewModel.handleBroadcastAction(intent)
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         initPermissionLauncher()
+
+        LocalBroadcastManager.getInstance(this)
+            .registerReceiver(broadcastReceiver, IntentFilter(NOTIFICATION_RESPONSE))
 
         lifecycleScope.launch {
             viewModel.apply {
@@ -181,12 +195,13 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun scheduleNotification(context: Context, notification: Notification) {
+        println(">>>>>>>>>>scheduleNotification: $notification ")
         val pendingIntent = getNotificationIntent(context, notification)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setRepeating(
+        alarmManager.setExact(
             AlarmManager.RTC_WAKEUP,
-            notification.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
+            System.currentTimeMillis() + 1000,// todo notification.timeInMillis,
+            //   AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
     }
@@ -215,6 +230,13 @@ class MainActivity : ComponentActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         return pendingIntent
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Unregister the receiver when the activity is destroyed
+        LocalBroadcastManager.getInstance(this)
+            .unregisterReceiver(broadcastReceiver)
     }
 
 }
