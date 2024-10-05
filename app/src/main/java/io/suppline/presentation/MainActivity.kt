@@ -201,15 +201,23 @@ class MainActivity : ComponentActivity() {
         isDaily: Boolean
     ) {
         println(">>>>>>>>>>scheduleNotification: $notification : $isDaily ")
-        val type = if (isDaily) AlarmManager.INTERVAL_DAY else AlarmManager.INTERVAL_DAY
         val pendingIntent = getNotificationIntent(context, notification)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExact(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + 1000,// todo notification.timeInMillis,
-            //   AlarmManager.INTERVAL_DAY,
-            pendingIntent
-        )
+        if (isDaily) {
+            alarmManager.setInexactRepeating(
+                AlarmManager.RTC_WAKEUP,
+                notification.timeInMillis,
+                AlarmManager.INTERVAL_DAY,
+                pendingIntent
+            )
+        } else {
+            alarmManager.setAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                notification.timeInMillis,
+                pendingIntent
+            )
+        }
+
     }
 
     private fun cancelScheduledNotification(context: Context, notification: Notification) {
