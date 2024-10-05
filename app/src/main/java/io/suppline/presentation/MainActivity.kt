@@ -18,7 +18,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,8 +27,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,7 +45,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.suppline.R
 import io.suppline.presentation.broadcastReceiver.NotificationReceiver
 import io.suppline.presentation.components.ActionButton
-import io.suppline.presentation.components.AddEditItem
+import io.suppline.presentation.components.AddEditSupplementModal
 import io.suppline.presentation.components.DefaultSections
 import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
@@ -114,6 +117,10 @@ class MainActivity : ComponentActivity() {
             SuppLineTheme {
 
                 val state = viewModel.state.value
+                var showModal by remember {
+                    mutableStateOf(false)
+                }
+                showModal = (state.editedItem != null)
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(
@@ -123,22 +130,20 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Logo(modifier = Modifier)
                         //todo extract code to Screen composable fun
-                        val isAddEditMode = (state.editedItem != null)
-                        AnimatedVisibility(visible = isAddEditMode) {
-                            AddEditItem(modifier = Modifier, viewModel = viewModel)
-                        }
-                        if (!isAddEditMode) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                ActionButton(
-                                    modifier = Modifier.padding(8.dp),
-                                    text = stringResource(id = R.string.add_supplement),
-                                    imageVector = Icons.Default.Add,
-                                    onClick = { viewModel.setEditedItem() },
-                                )
-                            }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            ActionButton(
+                                modifier = Modifier.padding(8.dp),
+                                text = stringResource(id = R.string.add_supplement),
+                                imageVector = Icons.Default.AddCircle,
+                                onClick = {
+                                    viewModel.setEditedItem()
+                                    showModal = true
+                                },
+                            )
                         }
                         if (state.groupSectionsByTime) GroupByTime(
                             modifier = Modifier.weight(1f),
@@ -158,6 +163,13 @@ class MainActivity : ComponentActivity() {
                             progress = state.progress
                         )
                     }
+                }
+
+                if (showModal) {
+                    AddEditSupplementModal(
+                        viewModel = viewModel,
+                        setShowStats = { showModal = it },
+                    )
                 }
 
             }

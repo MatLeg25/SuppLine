@@ -22,7 +22,6 @@ import io.suppline.presentation.SuppLineViewModelContract
 import io.suppline.presentation.events.AddEditSupplementEvent
 
 
-//TODO update UI (add text for buttons, consider move this feature to bottom modal)
 @Composable
 fun AddEditItem(
     modifier: Modifier = Modifier,
@@ -116,7 +115,5 @@ fun AddEditItem(
                 },
             )
         }
-
-
     }
 }
