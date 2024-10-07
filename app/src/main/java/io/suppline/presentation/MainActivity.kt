@@ -1,10 +1,6 @@
 package io.suppline.presentation
 
 import android.Manifest
-import android.app.AlarmManager
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -50,7 +46,6 @@ import io.suppline.presentation.components.DefaultSections
 import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
 import io.suppline.presentation.components.ProgressBar
-import io.suppline.presentation.models.Notification
 import io.suppline.presentation.ui.theme.SuppLineTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -64,9 +59,9 @@ class MainActivity : ComponentActivity() {
         const val BTN_ACTION_SNOOZE = "BTN_ACTION_SNOOZE"
         const val BTN_ACTION_DONE = "BTN_ACTION_DONE"
         const val BTN_ACTION_CANCEL = "BTN_ACTION_CANCEL"
-        const val ACTION_NOTIFICATION = "ACTION_NOTIFICATION"
+        const val ACTION_SHOW_NOTIFICATION = "ACTION_NOTIFICATION"
         const val EXTRA_NOTIFICATION_ID = "EXTRA_NOTIFICATION_ID"
-        const val EXTRA_NOTIFICATION_NAME = "EXTRA_NOTIFICATION_NAME"
+        const val EXTRA_PARCELABLE_NOTIFICATION = "EXTRA_PARCELABLE_NOTIFICATION"
         const val NOTIFICATION_RESPONSE = "NOTIFICATION_RESPONSE"
         const val EXTRA_RESPONSE_ACTION_INT = "EXTRA_RESPONSE_ACTION_INT"
     }

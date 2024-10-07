@@ -15,48 +15,60 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.suppline.R
 import io.suppline.presentation.MainActivity
-import io.suppline.presentation.MainActivity.Companion.ACTION_NOTIFICATION
+import io.suppline.presentation.MainActivity.Companion.ACTION_SHOW_NOTIFICATION
 import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_CANCEL
 import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_DONE
 import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_SNOOZE
 import io.suppline.presentation.MainActivity.Companion.EXTRA_NOTIFICATION_ID
-import io.suppline.presentation.MainActivity.Companion.EXTRA_NOTIFICATION_NAME
+import io.suppline.presentation.MainActivity.Companion.EXTRA_PARCELABLE_NOTIFICATION
 import io.suppline.presentation.MainActivity.Companion.EXTRA_RESPONSE_ACTION_INT
 import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_ID
 import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_RESPONSE
 import io.suppline.presentation.enums.NotificationResponseAction
+import io.suppline.presentation.mapper.toDomainModel
+import io.suppline.presentation.mapper.toParcelable
 import io.suppline.presentation.models.Notification
+import io.suppline.presentation.models.ParcelableNotification
+import kotlin.time.Duration.Companion.hours
 
 open class NotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         println(">>>> Recive at: ${System.currentTimeMillis()} , action = ${intent?.action}")
 
-        val notificationId = intent?.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
-        if (notificationId == null || notificationId == -1) return
-
+        val notification =
+            intent?.getParcelableExtra<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION)
+                ?: return
+        println(">>>> Recive notification = ${notification}")
         when (intent.action) {
 
-            MainActivity.ACTION_NOTIFICATION -> {
+            ACTION_SHOW_NOTIFICATION -> {
                 context?.let {
                     showNotification(
                         context = it,
-                        notificationId = notificationId,
-                        notificationName = intent.getStringExtra(EXTRA_NOTIFICATION_NAME) ?: ""
+                        notificationId = notification.id,
+                        notificationName = notification.name
+                    )
+                    //set for next day
+                    scheduleNotification(
+                        context = it,
+                        notification = notification.toDomainModel().copy(
+                            timeInMillis = notification.timeInMillis.plus(24.hours.inWholeMilliseconds)
+                        )
                     )
                 }
             }
 
             BTN_ACTION_SNOOZE -> handleUserAction(
-                context, notificationId, NotificationResponseAction.SNOOZE
+                context, notification.id, NotificationResponseAction.SNOOZE
             )
 
             BTN_ACTION_DONE -> handleUserAction(
-                context, notificationId, NotificationResponseAction.DONE
+                context, notification.id, NotificationResponseAction.DONE
             )
 
             BTN_ACTION_CANCEL -> handleUserAction(
-                context, notificationId, NotificationResponseAction.CANCEL
+                context, notification.id, NotificationResponseAction.CANCEL
             )
 
             else -> Unit
@@ -91,9 +103,8 @@ open class NotificationReceiver : BroadcastReceiver() {
 
     private fun getNotificationIntent(context: Context, notification: Notification): PendingIntent {
         val intent = Intent(context, NotificationReceiver::class.java).apply {
-            action = ACTION_NOTIFICATION
-            putExtra(EXTRA_NOTIFICATION_ID, notification.id)
-            putExtra(EXTRA_NOTIFICATION_NAME, notification.name)
+            action = ACTION_SHOW_NOTIFICATION
+            putExtra(EXTRA_PARCELABLE_NOTIFICATION, notification.toParcelable())
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
