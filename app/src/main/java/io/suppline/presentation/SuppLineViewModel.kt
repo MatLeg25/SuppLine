@@ -213,25 +213,26 @@ class SuppLineViewModel @Inject constructor(
                     }
                     _state.value = copy(supplements = list)
 
+                    val isBeforeCurrentTime =
+                        supplement.timeToConsume.localTimeToEpochMillis() < System.currentTimeMillis()
                     _updateNotification.emit(
                         NotificationState(
                             notification = Notification(
                                 id = supplement.id,
                                 name = supplement.name,
-                                timeInMillis = supplement.timeToConsume.localTimeToEpochMillis(),
+                                timeInMillis =
+                                if (isBeforeCurrentTime) supplement.timeToConsume.localTimeToEpochMillis()
+                                else supplement.timeToConsume.plusHours(24)
+                                    .localTimeToEpochMillis(),
                                 active = newState,
-                            ), hasNotificationsPermission = true, isDailyNotification = true
+                            ), hasNotificationsPermission = true
                         )
                     )
 
                 }
             } else {
                 _updateNotification.emit(
-                    NotificationState(
-                        notification = null,
-                        hasNotificationsPermission = false,
-                        isDailyNotification = true
-                    )
+                    NotificationState(notification = null, hasNotificationsPermission = false)
                 )
             }
             saveChanges()
@@ -258,9 +259,10 @@ class SuppLineViewModel @Inject constructor(
                             notification = Notification(
                                 id = supplement.id,
                                 name = supplement.name,
-                                timeInMillis = supplement.timeToConsume.plusMinutes(15).localTimeToEpochMillis(),
+                                timeInMillis = supplement.timeToConsume.plusMinutes(15)
+                                    .localTimeToEpochMillis(),
                                 active = true,
-                            ), hasNotificationsPermission = true, isDailyNotification = false
+                            ), hasNotificationsPermission = true
                         )
                     )
                 }

@@ -1,6 +1,8 @@
 package io.suppline.presentation.broadcastReceiver
 
 import android.Manifest
+import android.app.AlarmManager
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -13,6 +15,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.suppline.R
 import io.suppline.presentation.MainActivity
+import io.suppline.presentation.MainActivity.Companion.ACTION_NOTIFICATION
 import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_CANCEL
 import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_DONE
 import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_SNOOZE
@@ -22,8 +25,9 @@ import io.suppline.presentation.MainActivity.Companion.EXTRA_RESPONSE_ACTION_INT
 import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_ID
 import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_RESPONSE
 import io.suppline.presentation.enums.NotificationResponseAction
+import io.suppline.presentation.models.Notification
 
-class NotificationReceiver : BroadcastReceiver() {
+open class NotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         println(">>>> Recive at: ${System.currentTimeMillis()} , action = ${intent?.action}")
@@ -57,6 +61,47 @@ class NotificationReceiver : BroadcastReceiver() {
 
             else -> Unit
         }
+    }
+
+    fun scheduleNotification(
+        context: Context,
+        notification: Notification
+    ) {
+        val timeMillis = System.currentTimeMillis() + 10000
+        println(">>>>>>>>>>scheduleNotification: $notification , $timeMillis ")
+        val pendingIntent = getNotificationIntent(context, notification)
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            notification.timeInMillis,
+            pendingIntent
+        )
+    }
+
+    fun cancelScheduledNotification(context: Context, notification: Notification) {
+        // get the same intent that was used to schedule the notification
+        val pendingIntent = getNotificationIntent(context, notification)
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(pendingIntent)
+        // Cancel the notification if it has already been shown
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancel(notification.id)
+    }
+
+    private fun getNotificationIntent(context: Context, notification: Notification): PendingIntent {
+        val intent = Intent(context, NotificationReceiver::class.java).apply {
+            action = ACTION_NOTIFICATION
+            putExtra(EXTRA_NOTIFICATION_ID, notification.id)
+            putExtra(EXTRA_NOTIFICATION_NAME, notification.name)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            notification.id,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        return pendingIntent
     }
 
     private fun showNotification(context: Context, notificationId: Int, notificationName: String) {

@@ -4,6 +4,5 @@ import io.suppline.presentation.models.Notification
 
 data class NotificationState(
     val notification: Notification?,
-    val hasNotificationsPermission: Boolean,
-    val isDailyNotification: Boolean
+    val hasNotificationsPermission: Boolean
 )

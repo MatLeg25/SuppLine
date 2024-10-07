@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: SuppLineViewModel by viewModels()
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
-    private val broadcastReceiver = object : BroadcastReceiver() {
+    private val broadcastReceiver = object : NotificationReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             viewModel.handleBroadcastAction(intent)
         }
@@ -94,12 +94,11 @@ class MainActivity : ComponentActivity() {
                     notificationState?.let {
                         if (notificationState.hasNotificationsPermission) {
                             notificationState.notification?.let {
-                                if (it.active) scheduleNotification(
+                                if (it.active) broadcastReceiver.scheduleNotification(
                                     context = this@MainActivity,
-                                    notification = it,
-                                    notificationState.isDailyNotification
+                                    notification = it
                                 )
-                                else cancelScheduledNotification(
+                                else broadcastReceiver.cancelScheduledNotification(
                                     context = this@MainActivity,
                                     notification = it
                                 )
@@ -205,57 +204,6 @@ class MainActivity : ComponentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
-    }
-
-    private fun scheduleNotification(
-        context: Context,
-        notification: Notification,
-        isDaily: Boolean
-    ) {
-        println(">>>>>>>>>>scheduleNotification: $notification : $isDaily ")
-        val pendingIntent = getNotificationIntent(context, notification)
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        if (isDaily) {
-            alarmManager.setInexactRepeating(
-                AlarmManager.RTC_WAKEUP,
-                notification.timeInMillis,
-                AlarmManager.INTERVAL_DAY,
-                pendingIntent
-            )
-        } else {
-            alarmManager.setAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                notification.timeInMillis,
-                pendingIntent
-            )
-        }
-
-    }
-
-    private fun cancelScheduledNotification(context: Context, notification: Notification) {
-        // get the same intent that was used to schedule the notification
-        val pendingIntent = getNotificationIntent(context, notification)
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.cancel(pendingIntent)
-        // Cancel the notification if it has already been shown
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(notification.id)
-    }
-
-    private fun getNotificationIntent(context: Context, notification: Notification): PendingIntent {
-        val intent = Intent(context, NotificationReceiver::class.java).apply {
-            action = ACTION_NOTIFICATION
-            putExtra(EXTRA_NOTIFICATION_ID, notification.id)
-            putExtra(EXTRA_NOTIFICATION_NAME, notification.name)
-        }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            notification.id,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        return pendingIntent
     }
 
     override fun onDestroy() {
