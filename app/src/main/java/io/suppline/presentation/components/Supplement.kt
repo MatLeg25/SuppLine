@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,8 +27,7 @@ fun Supplement(
     toggleEditMode: () -> Unit,
     onEditClick: (supplement: Supplement) -> Unit,
     setConsumedTime: (supplement: Supplement, hourDelta: Int, minDelta: Int) -> Unit,
-    setNotification: (hasPermission: Boolean, supplement: Supplement) -> Unit,
-    hasNotificationsPermission: Boolean
+    setNotification: (supplement: Supplement) -> Unit
 ) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),
@@ -65,7 +63,7 @@ fun Supplement(
                 SetNotificationBtn(
                     isEnabled = isEditable,
                     isNotificationActive = model.hasNotification,
-                    setNotification = { setNotification(hasNotificationsPermission, model) }
+                    setNotification = { setNotification(model) }
                 )
                 if (isEditable) {
                     ActionButton(

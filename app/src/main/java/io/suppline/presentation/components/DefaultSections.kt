@@ -18,7 +18,6 @@ fun DefaultSections(
     modifier: Modifier = Modifier,
     supplements: List<Supplement>,
     viewModel: SuppLineViewModel,
-    hasNotificationsPermission: Boolean
 ) {
     val state = viewModel.state.value
     val isEditMode = (state.configItemIndex != null)
@@ -45,7 +44,6 @@ fun DefaultSections(
                 toggleEditMode = { viewModel.toggleEditMode(index) },
                 setConsumedTime = viewModel::setConsumedTime,
                 setNotification = viewModel::setNotification,
-                hasNotificationsPermission = hasNotificationsPermission
             )
             HorizontalDivider()
             AnimatedVisibility(visible = isEditable) {

@@ -200,40 +200,35 @@ class SuppLineViewModel @Inject constructor(
         saveChanges()
     }
 
-    //todo refactor hasNotificationsPermission
-    fun setNotification(hasPermission: Boolean, supplement: Supplement) {
+    fun setNotification(supplement: Supplement) {
         viewModelScope.launch {
-            if (hasPermission) {
-                val newState = !supplement.hasNotification
-                with(state.value) {
-                    val list = supplements.toMutableList()
-                    val indexToReplace = list.indexOf(supplement)
-                    if (indexToReplace in 0..list.lastIndex) {
-                        list[indexToReplace] = supplement.copy(hasNotification = newState)
-                    }
-                    _state.value = copy(supplements = list)
+            val newState = !supplement.hasNotification
+            with(state.value) {
+                val list = supplements.toMutableList()
+                val indexToReplace = list.indexOf(supplement)
+                if (indexToReplace in 0..list.lastIndex) {
+                    list[indexToReplace] = supplement.copy(hasNotification = newState)
+                }
+                _state.value = copy(supplements = list)
 
-                    val isBeforeCurrentTime =
-                        supplement.timeToConsume.localTimeToEpochMillis() < System.currentTimeMillis()
-                    _updateNotification.emit(
-                        NotificationState(
-                            notification = Notification(
-                                id = supplement.id,
-                                name = supplement.name,
-                                timeInMillis =
-                                if (isBeforeCurrentTime) supplement.timeToConsume.localTimeToEpochMillis()
-                                else supplement.timeToConsume.plusHours(24)
-                                    .localTimeToEpochMillis(),
-                                active = newState,
-                            ), hasNotificationsPermission = true
+                println(">>>>>>>>>>> ${supplement.timeToConsume} vs ${supplement.timeToConsume.localTimeToEpochMillis()} ")
+
+                val isBeforeCurrentTime =
+                    supplement.timeToConsume.localTimeToEpochMillis() < System.currentTimeMillis()
+                _updateNotification.emit(
+                    NotificationState(
+                        notification = Notification(
+                            id = supplement.id,
+                            name = supplement.name,
+                            timeInMillis =
+                            if (isBeforeCurrentTime) supplement.timeToConsume.localTimeToEpochMillis()
+                            else supplement.timeToConsume.plusHours(24)
+                                .localTimeToEpochMillis(),
+                            active = newState,
                         )
                     )
-
-                }
-            } else {
-                _updateNotification.emit(
-                    NotificationState(notification = null, hasNotificationsPermission = false)
                 )
+
             }
             saveChanges()
         }
@@ -262,7 +257,7 @@ class SuppLineViewModel @Inject constructor(
                                 timeInMillis = supplement.timeToConsume.plusMinutes(15)
                                     .localTimeToEpochMillis(),
                                 active = true,
-                            ), hasNotificationsPermission = true
+                            )
                         )
                     )
                 }

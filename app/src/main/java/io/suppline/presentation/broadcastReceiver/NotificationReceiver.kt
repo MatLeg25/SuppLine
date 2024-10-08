@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -24,7 +25,9 @@ import io.suppline.presentation.MainActivity.Companion.EXTRA_PARCELABLE_NOTIFICA
 import io.suppline.presentation.MainActivity.Companion.EXTRA_RESPONSE_ACTION_INT
 import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_ID
 import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_RESPONSE
+import io.suppline.presentation.enums.ErrorType
 import io.suppline.presentation.enums.NotificationResponseAction
+import io.suppline.presentation.error.CustomException
 import io.suppline.presentation.mapper.toDomainModel
 import io.suppline.presentation.mapper.toParcelable
 import io.suppline.presentation.models.Notification
@@ -75,19 +78,20 @@ open class NotificationReceiver : BroadcastReceiver() {
         }
     }
 
+    @Throws(CustomException::class)
     fun scheduleNotification(
-        context: Context,
-        notification: Notification
+        context: Context, notification: Notification
     ) {
-        val timeMillis = System.currentTimeMillis() + 10000
-        println(">>>>>>>>>>scheduleNotification: $notification , $timeMillis ")
+        println(">>>>>>>>> scheduleNotification: $notification")
         val pendingIntent = getNotificationIntent(context, notification)
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            notification.timeInMillis,
-            pendingIntent
-        )
+        if (hasPermissions(context)) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis() + 2000,//notification.timeInMillis,
+                pendingIntent
+            )
+        } else throw CustomException(ErrorType.UNKNOWN_ERROR, "UNKNOWN_ERROR")
     }
 
     fun cancelScheduledNotification(context: Context, notification: Notification) {
@@ -99,6 +103,32 @@ open class NotificationReceiver : BroadcastReceiver() {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.cancel(notification.id)
+    }
+
+    private fun hasPermissions(context: Context): Boolean {
+        return hasNotificationsPermission(context) && hasScheduleExactAlarmsPermission(context)
+    }
+
+    private fun hasNotificationsPermission(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = ActivityCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+            if (hasPermission) true else throw CustomException(
+                ErrorType.NO_POST_NOTIFICATIONS_PERMISSION, "NO_POST_NOTIFICATIONS_PERMISSION"
+            )
+        } else {
+            true
+        }
+    }
+
+    private fun hasScheduleExactAlarmsPermission(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (alarmManager.canScheduleExactAlarms()) true else throw CustomException(
+                ErrorType.NO_SCHEDULE_EXACT_ALARM_PERMISSION, "NO_SCHEDULE_EXACT_ALARM_PERMISSION"
+            )
+        } else true
     }
 
     private fun getNotificationIntent(context: Context, notification: Notification): PendingIntent {

@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -33,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -46,6 +44,9 @@ import io.suppline.presentation.components.DefaultSections
 import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
 import io.suppline.presentation.components.ProgressBar
+import io.suppline.presentation.enums.ErrorType
+import io.suppline.presentation.error.CustomException
+import io.suppline.presentation.models.Notification
 import io.suppline.presentation.ui.theme.SuppLineTheme
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -80,6 +81,8 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         initPermissionLauncher()
 
+        askScheduleExactAlarmsPermission()
+
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(broadcastReceiver, IntentFilter(NOTIFICATION_RESPONSE))
 
@@ -87,19 +90,8 @@ class MainActivity : ComponentActivity() {
             viewModel.apply {
                 updateNotification.collectLatest { notificationState ->
                     notificationState?.let {
-                        if (notificationState.hasNotificationsPermission) {
-                            notificationState.notification?.let {
-                                if (it.active) broadcastReceiver.scheduleNotification(
-                                    context = this@MainActivity,
-                                    notification = it
-                                )
-                                else broadcastReceiver.cancelScheduledNotification(
-                                    context = this@MainActivity,
-                                    notification = it
-                                )
-                            }
-                        } else {
-                            askNotificationsPermission()
+                        notificationState.notification?.let {
+                            setNotification(it)
                         }
                     }
                 }
@@ -142,12 +134,10 @@ class MainActivity : ComponentActivity() {
                         if (state.groupSectionsByTime) GroupByTime(
                             modifier = Modifier.weight(1f),
                             viewModel = viewModel,
-                            hasNotificationsPermission = hasNotificationsPermission()
                         ) else DefaultSections(
                             modifier = Modifier.weight(1f),
                             supplements = state.supplements,
                             viewModel = viewModel,
-                            hasNotificationsPermission = hasNotificationsPermission()
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         ProgressBar(
@@ -184,14 +174,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun hasNotificationsPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            (ActivityCompat.checkSelfPermission(
-                this@MainActivity,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED)
-        } else {
-            true
+    private fun setNotification(notification: Notification) {
+        try {
+            if (notification.active) broadcastReceiver.scheduleNotification(
+                context = this@MainActivity,
+                notification = notification
+            )
+            else broadcastReceiver.cancelScheduledNotification(
+                context = this@MainActivity,
+                notification = notification
+            )
+        } catch (e: CustomException) {
+            when (e.type) {
+                ErrorType.NO_POST_NOTIFICATIONS_PERMISSION -> askNotificationsPermission()
+                ErrorType.NO_SCHEDULE_EXACT_ALARM_PERMISSION -> askScheduleExactAlarmsPermission()
+                else -> displayUnknownErrorToast()
+            }
+        } catch (e: Exception) {
+            displayUnknownErrorToast()
         }
     }
 
@@ -201,11 +201,25 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun askScheduleExactAlarmsPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissionLauncher.launch(Manifest.permission.SCHEDULE_EXACT_ALARM)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         // Unregister the receiver when the activity is destroyed
         LocalBroadcastManager.getInstance(this)
             .unregisterReceiver(broadcastReceiver)
+    }
+
+    private fun displayUnknownErrorToast() {
+        Toast.makeText(
+            this,
+            getString(R.string.unknown_error_try_again_later),
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
 }
