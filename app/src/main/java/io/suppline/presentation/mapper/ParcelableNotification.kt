@@ -7,12 +7,14 @@ fun Notification.toParcelable() = ParcelableNotification(
     id = this.id,
     name = this.name,
     timeInMillis = this.timeInMillis,
-    active = this.active
+    active = this.active,
+    isDaily = this.isDaily
 )
 
 fun ParcelableNotification.toDomainModel() = Notification(
     id = this.id,
     name = this.name,
     timeInMillis = this.timeInMillis,
-    active = this.active
+    active = this.active,
+    isDaily = this.isDaily
 )

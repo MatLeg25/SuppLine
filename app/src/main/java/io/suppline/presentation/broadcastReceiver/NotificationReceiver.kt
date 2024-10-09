@@ -53,12 +53,15 @@ open class NotificationReceiver : BroadcastReceiver() {
                         notificationName = notification.name
                     )
                     //set for next day
-                    scheduleNotification(
-                        context = it,
-                        notification = notification.toDomainModel().copy(
-                            timeInMillis = notification.timeInMillis.plus(24.hours.inWholeMilliseconds)
+                    if (notification.isDaily) {
+                        scheduleNotification(
+                            context = it,
+                            notification = notification.toDomainModel().copy(
+                                timeInMillis = notification.timeInMillis.plus(24.hours.inWholeMilliseconds)
+                            )
                         )
-                    )
+                    }
+
                 }
             }
 
@@ -88,7 +91,7 @@ open class NotificationReceiver : BroadcastReceiver() {
 
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
-                System.currentTimeMillis() + 2000,//notification.timeInMillis,
+                notification.timeInMillis,
                 pendingIntent
             )
         } else throw CustomException(ErrorType.UNKNOWN_ERROR, "UNKNOWN_ERROR")

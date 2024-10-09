@@ -226,6 +226,7 @@ class SuppLineViewModel @Inject constructor(
                                 else supplement.timeToConsume.plusHours(24)
                                     .localTimeToEpochMillis(),
                                 active = newState,
+                                isDaily = true
                             )
                         )
                     )
@@ -259,6 +260,7 @@ class SuppLineViewModel @Inject constructor(
                                 timeInMillis = supplement.timeToConsume.plusMinutes(15)
                                     .localTimeToEpochMillis(),
                                 active = true,
+                                isDaily = false
                             )
                         )
                     )
