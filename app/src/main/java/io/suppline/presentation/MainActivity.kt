@@ -90,9 +90,9 @@ class MainActivity : ComponentActivity() {
             viewModel.apply {
                 updateNotification.collectLatest { notificationState ->
                     notificationState?.let {
-                        notificationState.notification?.let {
+                        if (viewModel.hasNotificationsPermission) notificationState.notification?.let {
                             setNotification(it)
-                        }
+                        } else checkNotificationsPermission()
                     }
                 }
             }
@@ -170,7 +170,7 @@ class MainActivity : ComponentActivity() {
                     this.getString(R.string.permission_denied),
                     Toast.LENGTH_SHORT
                 ).show()
-            }
+            } else checkNotificationsPermission()
         }
     }
 
@@ -184,6 +184,20 @@ class MainActivity : ComponentActivity() {
                 context = this@MainActivity,
                 notification = notification
             )
+        } catch (e: CustomException) {
+            when (e.type) {
+                ErrorType.NO_POST_NOTIFICATIONS_PERMISSION -> askNotificationsPermission()
+                ErrorType.NO_SCHEDULE_EXACT_ALARM_PERMISSION -> askScheduleExactAlarmsPermission()
+                else -> displayUnknownErrorToast()
+            }
+        } catch (e: Exception) {
+            displayUnknownErrorToast()
+        }
+    }
+
+    private fun checkNotificationsPermission() {
+        try {
+            viewModel.hasNotificationsPermission = broadcastReceiver.hasPermissions(this)
         } catch (e: CustomException) {
             when (e.type) {
                 ErrorType.NO_POST_NOTIFICATIONS_PERMISSION -> askNotificationsPermission()

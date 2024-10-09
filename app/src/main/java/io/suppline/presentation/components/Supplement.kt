@@ -27,7 +27,7 @@ fun Supplement(
     toggleEditMode: () -> Unit,
     onEditClick: (supplement: Supplement) -> Unit,
     setConsumedTime: (supplement: Supplement, hourDelta: Int, minDelta: Int) -> Unit,
-    setNotification: (supplement: Supplement) -> Unit
+    setNotification: (supplement: Supplement) -> Unit,
 ) {
     Row(
         modifier = modifier.padding(horizontal = 20.dp),

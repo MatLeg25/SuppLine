@@ -82,10 +82,10 @@ open class NotificationReceiver : BroadcastReceiver() {
     fun scheduleNotification(
         context: Context, notification: Notification
     ) {
-        println(">>>>>>>>> scheduleNotification: $notification")
-        val pendingIntent = getNotificationIntent(context, notification)
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         if (hasPermissions(context)) {
+            val pendingIntent = getNotificationIntent(context, notification)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis() + 2000,//notification.timeInMillis,
@@ -94,18 +94,22 @@ open class NotificationReceiver : BroadcastReceiver() {
         } else throw CustomException(ErrorType.UNKNOWN_ERROR, "UNKNOWN_ERROR")
     }
 
+    @Throws(CustomException::class)
     fun cancelScheduledNotification(context: Context, notification: Notification) {
-        // get the same intent that was used to schedule the notification
-        val pendingIntent = getNotificationIntent(context, notification)
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.cancel(pendingIntent)
-        // Cancel the notification if it has already been shown
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(notification.id)
+        if (hasPermissions(context)) {
+            // get the same intent that was used to schedule the notification
+            val pendingIntent = getNotificationIntent(context, notification)
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(pendingIntent)
+            // Cancel the notification if it has already been shown
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(notification.id)
+        } else throw CustomException(ErrorType.UNKNOWN_ERROR, "UNKNOWN_ERROR")
     }
 
-    private fun hasPermissions(context: Context): Boolean {
+    @Throws(CustomException::class)
+    fun hasPermissions(context: Context): Boolean {
         return hasNotificationsPermission(context) && hasScheduleExactAlarmsPermission(context)
     }
 
