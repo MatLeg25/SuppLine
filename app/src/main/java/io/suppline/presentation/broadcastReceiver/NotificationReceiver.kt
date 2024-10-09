@@ -28,6 +28,7 @@ import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_RESPONSE
 import io.suppline.presentation.enums.ErrorType
 import io.suppline.presentation.enums.NotificationResponseAction
 import io.suppline.presentation.error.CustomException
+import io.suppline.presentation.extension.parcelable
 import io.suppline.presentation.mapper.toDomainModel
 import io.suppline.presentation.mapper.toParcelable
 import io.suppline.presentation.models.Notification
@@ -38,10 +39,7 @@ open class NotificationReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         println(">>>> Recive at: ${System.currentTimeMillis()} , action = ${intent?.action}")
-
-        val notification =
-            intent?.getParcelableExtra<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION)
-                ?: return
+        val notification = intent?.parcelable<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION) ?: return
         println(">>>> Recive notification = ${notification}")
         when (intent.action) {
 
