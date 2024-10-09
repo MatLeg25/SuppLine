@@ -38,6 +38,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.suppline.R
 import io.suppline.presentation.broadcastReceiver.NotificationReceiver
+import io.suppline.presentation.broadcastReceiver.NotificationReceiverContract
 import io.suppline.presentation.components.ActionButton
 import io.suppline.presentation.components.AddEditSupplementModal
 import io.suppline.presentation.components.DefaultSections
@@ -45,7 +46,7 @@ import io.suppline.presentation.components.GroupByTime
 import io.suppline.presentation.components.Logo
 import io.suppline.presentation.components.ProgressBar
 import io.suppline.presentation.enums.ErrorType
-import io.suppline.presentation.error.CustomException
+import io.suppline.presentation.error.NotificationException
 import io.suppline.presentation.models.Notification
 import io.suppline.presentation.ui.theme.SuppLineTheme
 import kotlinx.coroutines.flow.collectLatest
@@ -69,7 +70,8 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: SuppLineViewModel by viewModels()
     private lateinit var permissionLauncher: ActivityResultLauncher<String>
-    private val broadcastReceiver = object : NotificationReceiver() {
+
+    private val broadcastReceiver: NotificationReceiverContract = object : NotificationReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             viewModel.handleBroadcastAction(intent)
         }
@@ -184,7 +186,7 @@ class MainActivity : ComponentActivity() {
                 context = this@MainActivity,
                 notification = notification
             )
-        } catch (e: CustomException) {
+        } catch (e: NotificationException) {
             when (e.type) {
                 ErrorType.NO_POST_NOTIFICATIONS_PERMISSION -> askNotificationsPermission()
                 ErrorType.NO_SCHEDULE_EXACT_ALARM_PERMISSION -> askScheduleExactAlarmsPermission()
@@ -198,7 +200,7 @@ class MainActivity : ComponentActivity() {
     private fun checkNotificationsPermission() {
         try {
             viewModel.hasNotificationsPermission = broadcastReceiver.hasPermissions(this)
-        } catch (e: CustomException) {
+        } catch (e: NotificationException) {
             when (e.type) {
                 ErrorType.NO_POST_NOTIFICATIONS_PERMISSION -> askNotificationsPermission()
                 ErrorType.NO_SCHEDULE_EXACT_ALARM_PERMISSION -> askScheduleExactAlarmsPermission()

@@ -27,7 +27,7 @@ import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_ID
 import io.suppline.presentation.MainActivity.Companion.NOTIFICATION_RESPONSE
 import io.suppline.presentation.enums.ErrorType
 import io.suppline.presentation.enums.NotificationResponseAction
-import io.suppline.presentation.error.CustomException
+import io.suppline.presentation.error.NotificationException
 import io.suppline.presentation.extension.parcelable
 import io.suppline.presentation.mapper.toDomainModel
 import io.suppline.presentation.mapper.toParcelable
@@ -35,11 +35,12 @@ import io.suppline.presentation.models.Notification
 import io.suppline.presentation.models.ParcelableNotification
 import kotlin.time.Duration.Companion.hours
 
-open class NotificationReceiver : BroadcastReceiver() {
+open class NotificationReceiver : NotificationReceiverContract() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         println(">>>> Recive at: ${System.currentTimeMillis()} , action = ${intent?.action}")
-        val notification = intent?.parcelable<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION) ?: return
+        val notification =
+            intent?.parcelable<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION) ?: return
         println(">>>> Recive notification = ${notification}")
         when (intent.action) {
 
@@ -79,8 +80,8 @@ open class NotificationReceiver : BroadcastReceiver() {
         }
     }
 
-    @Throws(CustomException::class)
-    fun scheduleNotification(
+    @Throws(NotificationException::class)
+    override fun scheduleNotification(
         context: Context, notification: Notification
     ) {
         if (hasPermissions(context)) {
@@ -92,11 +93,11 @@ open class NotificationReceiver : BroadcastReceiver() {
                 notification.timeInMillis,
                 pendingIntent
             )
-        } else throw CustomException(ErrorType.UNKNOWN_ERROR, "UNKNOWN_ERROR")
+        } else throw NotificationException(ErrorType.UNKNOWN_ERROR, "UNKNOWN_ERROR")
     }
 
-    @Throws(CustomException::class)
-    fun cancelScheduledNotification(context: Context, notification: Notification) {
+    @Throws(NotificationException::class)
+    override fun cancelScheduledNotification(context: Context, notification: Notification) {
         if (hasPermissions(context)) {
             // get the same intent that was used to schedule the notification
             val pendingIntent = getNotificationIntent(context, notification)
@@ -106,11 +107,11 @@ open class NotificationReceiver : BroadcastReceiver() {
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.cancel(notification.id)
-        } else throw CustomException(ErrorType.UNKNOWN_ERROR, "UNKNOWN_ERROR")
+        } else throw NotificationException(ErrorType.UNKNOWN_ERROR, "UNKNOWN_ERROR")
     }
 
-    @Throws(CustomException::class)
-    fun hasPermissions(context: Context): Boolean {
+    @Throws(NotificationException::class)
+    override fun hasPermissions(context: Context): Boolean {
         return hasNotificationsPermission(context) && hasScheduleExactAlarmsPermission(context)
     }
 
@@ -119,7 +120,7 @@ open class NotificationReceiver : BroadcastReceiver() {
             val hasPermission = ActivityCompat.checkSelfPermission(
                 context, Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
-            if (hasPermission) true else throw CustomException(
+            if (hasPermission) true else throw NotificationException(
                 ErrorType.NO_POST_NOTIFICATIONS_PERMISSION, "NO_POST_NOTIFICATIONS_PERMISSION"
             )
         } else {
@@ -130,7 +131,7 @@ open class NotificationReceiver : BroadcastReceiver() {
     private fun hasScheduleExactAlarmsPermission(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT > Build.VERSION_CODES.S) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            if (alarmManager.canScheduleExactAlarms()) true else throw CustomException(
+            if (alarmManager.canScheduleExactAlarms()) true else throw NotificationException(
                 ErrorType.NO_SCHEDULE_EXACT_ALARM_PERMISSION, "NO_SCHEDULE_EXACT_ALARM_PERMISSION"
             )
         } else true
@@ -249,6 +250,5 @@ open class NotificationReceiver : BroadcastReceiver() {
             LocalBroadcastManager.getInstance(it).sendBroadcast(localIntent)
         }
     }
-
 
 }
