@@ -46,11 +46,7 @@ open class NotificationReceiver : NotificationReceiverContract() {
 
             ACTION_SHOW_NOTIFICATION -> {
                 context?.let {
-                    showNotification(
-                        context = it,
-                        notificationId = notification.id,
-                        notificationName = notification.name
-                    )
+                    showNotification(context = it, notification = notification)
                     //set for next day
                     if (notification.isDaily) {
                         scheduleNotification(
@@ -151,7 +147,7 @@ open class NotificationReceiver : NotificationReceiverContract() {
         return pendingIntent
     }
 
-    private fun showNotification(context: Context, notificationId: Int, notificationName: String) {
+    private fun showNotification(context: Context, notification: ParcelableNotification) {
         with(context) {
             val notificationManager = NotificationManagerCompat.from(context)
 
@@ -167,7 +163,7 @@ open class NotificationReceiver : NotificationReceiverContract() {
                 requestCode = NotificationResponseAction.SNOOZE.value,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
                     action = BTN_ACTION_SNOOZE
-                    putExtra(EXTRA_NOTIFICATION_ID, notificationId)
+                    putExtra(EXTRA_PARCELABLE_NOTIFICATION, notification)
                 },
             )
 
@@ -176,7 +172,7 @@ open class NotificationReceiver : NotificationReceiverContract() {
                 requestCode = NotificationResponseAction.DONE.value,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
                     action = BTN_ACTION_DONE
-                    putExtra(EXTRA_NOTIFICATION_ID, notificationId)
+                    putExtra(EXTRA_PARCELABLE_NOTIFICATION, notification)
                 },
             )
 
@@ -185,14 +181,14 @@ open class NotificationReceiver : NotificationReceiverContract() {
                 requestCode = NotificationResponseAction.CANCEL.value,
                 intent = Intent(this, NotificationReceiver::class.java).apply {
                     action = BTN_ACTION_CANCEL
-                    putExtra(EXTRA_NOTIFICATION_ID, notificationId)
+                    putExtra(EXTRA_PARCELABLE_NOTIFICATION, notification)
                 },
             )
 
             val builder = NotificationCompat.Builder(this, MainActivity.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle(getString(R.string.suppline_X, notificationId))
-                .setContentText(getString(R.string.time_to_consume_X, notificationName))
+                .setContentTitle(getString(R.string.suppline_X, notification.id))
+                .setContentText(getString(R.string.time_to_consume_X, notification.name))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setContentIntent(contentIntent)
@@ -234,7 +230,6 @@ open class NotificationReceiver : NotificationReceiverContract() {
     private fun handleUserAction(
         context: Context?, notificationId: Int, responseAction: NotificationResponseAction
     ) {
-        // Handle the snooze action
         Toast.makeText(
             context,
             "$responseAction action triggered for notification ID: $notificationId",
