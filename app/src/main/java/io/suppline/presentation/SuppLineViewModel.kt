@@ -277,5 +277,15 @@ class SuppLineViewModel @Inject constructor(
 
     }
 
+    fun scrollToIndex(index: Int) {
+        if (index in state.value.supplements.indices) {
+            _state.value = state.value.copy(scrollToIndex = index)
+        }
+    }
+
+    fun onScrollEnd() {
+        _state.value = state.value.copy(scrollToIndex = null)
+    }
+
 
 }

@@ -85,8 +85,7 @@ class MainActivity : ComponentActivity() {
         initPermissionLauncher()
         askScheduleExactAlarmsPermission()
 
-        val notificationId = intent?.getIntExtra(EXTRA_NOTIFICATION_ID, -1) ?: -1
-        println(">>>>>>>>>>>>>>>>>notificationId = $notificationId ")
+        viewModel.scrollToIndex(intent?.getIntExtra(EXTRA_NOTIFICATION_ID, -1) ?: -1)
 
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(broadcastReceiver, IntentFilter(NOTIFICATION_RESPONSE))
@@ -139,10 +138,12 @@ class MainActivity : ComponentActivity() {
                         if (state.groupSectionsByTime) GroupByTime(
                             modifier = Modifier.weight(1f),
                             viewModel = viewModel,
+                            index = state.scrollToIndex ?: -1
                         ) else DefaultSections(
                             modifier = Modifier.weight(1f),
                             supplements = state.supplements,
                             viewModel = viewModel,
+                            index = state.scrollToIndex ?: -1
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         ProgressBar(

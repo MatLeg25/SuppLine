@@ -7,7 +7,8 @@ import io.suppline.presentation.SuppLineViewModel
 @Composable
 fun GroupByTime(
     modifier: Modifier = Modifier,
-    viewModel: SuppLineViewModel
+    viewModel: SuppLineViewModel,
+    index: Int = -1,
 ) {
     val state = viewModel.state.value
     val sectionsMap = state.getSupplementsByHours()
@@ -18,6 +19,7 @@ fun GroupByTime(
                 modifier = modifier,
                 supplements = supplements,
                 viewModel = viewModel,
+                index = index
             )
         }
     }
