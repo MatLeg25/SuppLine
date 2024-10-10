@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
         const val BTN_ACTION_DONE = "BTN_ACTION_DONE"
         const val BTN_ACTION_CANCEL = "BTN_ACTION_CANCEL"
         const val ACTION_SHOW_NOTIFICATION = "ACTION_NOTIFICATION"
+        const val ACTION_NOTIFICATION_PRESSED = "ACTION_NOTIFICATION_PRESSED"
         const val EXTRA_NOTIFICATION_ID = "EXTRA_NOTIFICATION_ID"
         const val EXTRA_PARCELABLE_NOTIFICATION = "EXTRA_PARCELABLE_NOTIFICATION"
         const val NOTIFICATION_RESPONSE = "NOTIFICATION_RESPONSE"
@@ -82,8 +83,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
         initPermissionLauncher()
-
         askScheduleExactAlarmsPermission()
+
+        val notificationId = intent?.getIntExtra(EXTRA_NOTIFICATION_ID, -1) ?: -1
+        println(">>>>>>>>>>>>>>>>>notificationId = $notificationId ")
 
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(broadcastReceiver, IntentFilter(NOTIFICATION_RESPONSE))

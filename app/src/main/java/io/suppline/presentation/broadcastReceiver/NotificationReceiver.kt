@@ -16,6 +16,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.suppline.R
 import io.suppline.presentation.MainActivity
+import io.suppline.presentation.MainActivity.Companion.ACTION_NOTIFICATION_PRESSED
 import io.suppline.presentation.MainActivity.Companion.ACTION_SHOW_NOTIFICATION
 import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_CANCEL
 import io.suppline.presentation.MainActivity.Companion.BTN_ACTION_DONE
@@ -154,7 +155,10 @@ open class NotificationReceiver : NotificationReceiverContract() {
             val contentIntent: PendingIntent = PendingIntent.getActivity(
                 this,
                 123,
-                Intent(this, MainActivity::class.java),
+                Intent(this, MainActivity::class.java).apply {
+                    action = ACTION_NOTIFICATION_PRESSED
+                    putExtra(EXTRA_NOTIFICATION_ID, notification.id)
+                },
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
