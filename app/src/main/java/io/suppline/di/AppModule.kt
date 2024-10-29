@@ -8,9 +8,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.suppline.data.preferences.DefaultPreferences
+import io.suppline.domain.Config.SHARED_PREFERENCES_NAME
 import io.suppline.domain.preferences.Preferences
-import io.suppline.domain.useCase.GetDailySupplementationUseCase
-import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import javax.inject.Singleton
 
 @Module
@@ -22,7 +21,7 @@ object AppModule {
     fun provideSharedPreferences(
         app: Application
     ): SharedPreferences {
-        return app.getSharedPreferences("shared_pref", Context.MODE_PRIVATE)
+        return app.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
     }
 
     @Provides

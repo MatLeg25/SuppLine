@@ -13,4 +13,6 @@ object Config {
         "Vitamin C",
     )
 
+    const val SHARED_PREFERENCES_NAME = "SuppLine_shared_preferences"
+
 }
