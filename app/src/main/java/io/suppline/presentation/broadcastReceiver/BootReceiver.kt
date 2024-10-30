@@ -1,15 +1,18 @@
 package io.suppline.presentation.broadcastReceiver
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import io.suppline.di.BootReceiverHelperEntryPoint
 
-class BootReceiver : BroadcastReceiver() {
+@AndroidEntryPoint
+class BootReceiver: BroadcastReceiver() {
+
     override fun onReceive(context: Context, intent: Intent) {
-        println(">>>>>>>>>> BootRecive : onReceive -> ${intent.action} ")
+        println(">>>>>>>>>> BootRecive : onReceive")
         Toast.makeText(
             context,
             "Device Rebooted - BootBroadcastReceiver triggered",
@@ -17,22 +20,9 @@ class BootReceiver : BroadcastReceiver() {
         ).show()
 
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            rescheduleAlarms(context)
+            val helper = EntryPointAccessors.fromApplication(context, BootReceiverHelperEntryPoint::class.java)
+            helper.getBootReceiverHelper().rescheduleAlarms(context)
         }
     }
 
-    private fun rescheduleAlarms(context: Context) {
-    println(">>>>>>>>> scheduleWorkManager ")
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent = Intent(context, NotificationReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + 5000,
-            AlarmManager.INTERVAL_DAY,
-            alarmIntent
-        )
-    }
 }
