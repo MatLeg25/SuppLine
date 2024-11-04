@@ -4,9 +4,9 @@ import android.Manifest
 import android.app.AlarmManager
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
@@ -248,6 +248,32 @@ open class NotificationReceiver : NotificationReceiverContract() {
             }
             LocalBroadcastManager.getInstance(it).sendBroadcast(localIntent)
         }
+    }
+
+    fun rescheduleAlarms(context: Context, sharedPreferences: SharedPreferences) {
+        println(">>>> rescheduleAlarms ")
+        val pref = sharedPreferences
+        println(">>>> rescheduleAlarms prefS= $pref ")
+      //  val s = preferences.loadDailySupplements()?.supplements
+      //  println(">>>>>>>>> scheduleWorkManager , S = $s")
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmIntent = Intent(context, NotificationReceiver::class.java).let { intent ->
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        }
+
+        try {
+            scheduleNotification(
+                context,
+                Notification(
+                    -11, "testNotification", System.currentTimeMillis() + 5000,
+                    true,
+                    true
+                )
+            )
+        } catch (e: Exception) {
+            println(">>>> Cannot reschedule notification: ${e.message}")
+        }
+
     }
 
 }
