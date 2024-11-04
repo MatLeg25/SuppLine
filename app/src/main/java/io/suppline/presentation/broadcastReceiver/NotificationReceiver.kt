@@ -242,7 +242,7 @@ open class NotificationReceiver : NotificationReceiverContract() {
         }
     }
 
-    fun rescheduleAlarms(context: Context, preferences: Preferences) {
+    override fun rescheduleAlarms(context: Context, preferences: Preferences) {
         val alarms = preferences.loadDailySupplements()?.supplements?.filter { it.hasNotification }
         try {
             alarms?.forEach { supplement ->
