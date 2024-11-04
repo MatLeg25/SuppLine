@@ -15,6 +15,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.suppline.R
 import io.suppline.domain.preferences.Preferences
+import io.suppline.domain.utils.extensions.localTimeToEpochMillis
 import io.suppline.presentation.MainActivity
 import io.suppline.presentation.MainActivity.Companion.ACTION_NOTIFICATION_PRESSED
 import io.suppline.presentation.MainActivity.Companion.ACTION_SHOW_NOTIFICATION
@@ -256,26 +257,25 @@ open class NotificationReceiver : NotificationReceiverContract() {
             "Device Rebooted - BootBroadcastReceiver triggered",
             Toast.LENGTH_SHORT
         ).show()
-        println(">>>>>>>>>>>>> rescheduleAlarms = ${preferences.loadDailySupplements()?.supplements} ")
-      //  println(">>>>>>>>> scheduleWorkManager , S = $s")
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val alarmIntent = Intent(context, NotificationReceiver::class.java).let { intent ->
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-
+        val alarms = preferences.loadDailySupplements()?.supplements?.filter { it.hasNotification }
+        println(">>>>>>>>>>>>> lists = ${preferences.loadDailySupplements()?.supplements} ")
+        println(">>>>>>>>>>>>> rescheduleAlarms = $alarms ")
         try {
-            scheduleNotification(
-                context,
-                Notification(
-                    -11, "testNotification", System.currentTimeMillis() + 5000,
-                    true,
-                    true
+            alarms?.forEach { supplement ->
+                scheduleNotification(
+                    context = context,
+                    notification = Notification(
+                        id = supplement.id,
+                        name = supplement.name,
+                        timeInMillis = supplement.timeToConsume.localTimeToEpochMillis(),
+                        active = true,
+                        isDaily = true
+                    )
                 )
-            )
+            }
         } catch (e: Exception) {
             println(">>>> Cannot reschedule notification: ${e.message}")
         }
-
     }
 
 }
