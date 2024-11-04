@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -40,10 +39,7 @@ import kotlin.time.Duration.Companion.hours
 open class NotificationReceiver : NotificationReceiverContract() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        println(">>>> Recive at: ${System.currentTimeMillis()} , action = ${intent?.action}")
-        val notification =
-            intent?.parcelable<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION) ?: return
-        println(">>>> Recive notification = ${notification}")
+        val notification = intent?.parcelable<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION) ?: return
         when (intent.action) {
 
             ACTION_SHOW_NOTIFICATION -> {
@@ -235,11 +231,6 @@ open class NotificationReceiver : NotificationReceiverContract() {
     private fun handleUserAction(
         context: Context?, notificationId: Int, responseAction: NotificationResponseAction
     ) {
-        Toast.makeText(
-            context,
-            "$responseAction action triggered for notification ID: $notificationId",
-            Toast.LENGTH_SHORT
-        ).show()
         context?.let {
             val notificationManager = NotificationManagerCompat.from(context)
             notificationManager.cancel(NOTIFICATION_ID)
@@ -252,14 +243,7 @@ open class NotificationReceiver : NotificationReceiverContract() {
     }
 
     fun rescheduleAlarms(context: Context, preferences: Preferences) {
-        Toast.makeText(
-            context,
-            "Device Rebooted - BootBroadcastReceiver triggered",
-            Toast.LENGTH_SHORT
-        ).show()
         val alarms = preferences.loadDailySupplements()?.supplements?.filter { it.hasNotification }
-        println(">>>>>>>>>>>>> lists = ${preferences.loadDailySupplements()?.supplements} ")
-        println(">>>>>>>>>>>>> rescheduleAlarms = $alarms ")
         try {
             alarms?.forEach { supplement ->
                 scheduleNotification(
