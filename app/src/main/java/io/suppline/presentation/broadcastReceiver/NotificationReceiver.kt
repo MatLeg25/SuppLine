@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
@@ -15,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import io.suppline.R
+import io.suppline.domain.preferences.Preferences
 import io.suppline.presentation.MainActivity
 import io.suppline.presentation.MainActivity.Companion.ACTION_NOTIFICATION_PRESSED
 import io.suppline.presentation.MainActivity.Companion.ACTION_SHOW_NOTIFICATION
@@ -250,11 +250,13 @@ open class NotificationReceiver : NotificationReceiverContract() {
         }
     }
 
-    fun rescheduleAlarms(context: Context, sharedPreferences: SharedPreferences) {
-        println(">>>> rescheduleAlarms ")
-        val pref = sharedPreferences
-        println(">>>> rescheduleAlarms prefS= $pref ")
-      //  val s = preferences.loadDailySupplements()?.supplements
+    fun rescheduleAlarms(context: Context, preferences: Preferences) {
+        Toast.makeText(
+            context,
+            "Device Rebooted - BootBroadcastReceiver triggered",
+            Toast.LENGTH_SHORT
+        ).show()
+        println(">>>>>>>>>>>>> rescheduleAlarms = ${preferences.loadDailySupplements()?.supplements} ")
       //  println(">>>>>>>>> scheduleWorkManager , S = $s")
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val alarmIntent = Intent(context, NotificationReceiver::class.java).let { intent ->
