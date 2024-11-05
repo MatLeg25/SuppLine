@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.suppline.R
+import io.suppline.domain.Config
 import io.suppline.domain.models.Supplement
 
 @Composable
@@ -50,7 +51,7 @@ fun Supplement(
                     fontSize = 8.sp,
                     fontStyle = FontStyle.Italic,
                     text = model.description,
-                    maxLines = 3,
+                    maxLines = Config.MAX_NEW_LINES,
                     overflow = TextOverflow.Ellipsis,
                 )
             }

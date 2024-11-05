@@ -46,8 +46,10 @@ fun AddEditItem(
     }
 
     fun validateDescription() {
+        // Calculate the number of newline characters
+        val lines = supplement.description.count { it == '\n' }
         descriptionCharactersLeft = (Config.MAX_DESCRIPTION_LENGTH - supplement.description.length)
-        isDescriptionError = (supplement.description.length > Config.MAX_DESCRIPTION_LENGTH)
+        isDescriptionError = (supplement.description.length > Config.MAX_DESCRIPTION_LENGTH) || lines >= Config.MAX_NEW_LINES
     }
 
     key(supplement) {
