@@ -10,6 +10,7 @@
     <string name="remove">Remove</string>
     <string name="name">Name</string>
     <string name="name_cannot_be_empty">Name cannot be empty</string>
+    <string name="exceed_max_length_x">Max text length is %1$s</string>
     <string name="accept">Accept</string>
     <string name="description">Description</string>
     <string name="optional">Optional</string>

@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -18,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.suppline.R
+import io.suppline.domain.Config
 import io.suppline.presentation.SuppLineViewModelContract
 import io.suppline.presentation.events.AddEditSupplementEvent
 
@@ -27,13 +30,29 @@ fun AddEditItem(
     modifier: Modifier = Modifier,
     viewModel: SuppLineViewModelContract
 ) {
-    val supplement = viewModel.getEditedItem() ?: return
-    var isError by remember {
+    val supplement =  viewModel.getEditedItem() ?: return
+    var isNameError by remember {
         mutableStateOf(false)
+    }
+    var isDescriptionError by remember {
+        mutableStateOf(false)
+    }
+    var descriptionCharactersLeft by remember {
+        mutableIntStateOf(Config.MAX_DESCRIPTION_LENGTH - supplement.description.length)
     }
 
     fun validateName() {
-        isError = supplement.name.isBlank()
+        isNameError = supplement.name.isBlank()
+    }
+
+    fun validateDescription() {
+        descriptionCharactersLeft = (Config.MAX_DESCRIPTION_LENGTH - supplement.description.length)
+        isDescriptionError = (supplement.description.length > Config.MAX_DESCRIPTION_LENGTH)
+    }
+
+    key(supplement) {
+        validateName()
+        validateDescription()
     }
 
     Column(modifier = modifier) {
@@ -44,11 +63,10 @@ fun AddEditItem(
                         Text(text = stringResource(id = R.string.name))
                     },
                     placeholder = {
-                        Text(text = stringResource(id = if (isError) R.string.name_cannot_be_empty else R.string.name))
+                        Text(text = stringResource(id = if (isNameError) R.string.name_cannot_be_empty else R.string.name))
                     },
                     value = supplement.name,
                     onValueChange = {
-                        validateName()
                         viewModel.onEvent(
                             event = AddEditSupplementEvent.OnNameChange(
                                 supplement = supplement,
@@ -56,17 +74,15 @@ fun AddEditItem(
                             )
                         )
                     },
-                    isError = isError
+                    isError = isNameError
                 )
 
                 TextField(
                     label = {
-                        Text(text = stringResource(id = R.string.description))
+                        Text(text = stringResource(id = R.string.description) + " [$descriptionCharactersLeft]")
                     },
                     placeholder = {
-                        Text(
-                            text = stringResource(id = R.string.description) + "(${stringResource(id = R.string.description)})"
-                        )
+                        Text(text = stringResource(id = R.string.description))
                     },
                     value = supplement.description,
                     onValueChange = {
@@ -76,7 +92,8 @@ fun AddEditItem(
                                 description = it
                             )
                         )
-                    }
+                    },
+                    isError = isDescriptionError
                 )
             }
         }
@@ -87,7 +104,8 @@ fun AddEditItem(
                 imageVector = Icons.Default.CheckCircle,
                 onClick = {
                     validateName()
-                    if (!isError) {
+                    validateDescription()
+                    if (!(isNameError || isDescriptionError)) {
                         viewModel.onEvent(
                             event = AddEditSupplementEvent.Accept
                         )

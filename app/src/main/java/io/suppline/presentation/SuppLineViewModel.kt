@@ -65,6 +65,7 @@ class SuppLineViewModel @Inject constructor(
             }
 
             is AddEditSupplementEvent.OnDescriptionChange -> {
+                println(">>> vm OnDescriptionChange ")
                 _state.value = state.value.copy(
                     editedItem = event.supplement.copy(description = event.description)
                 )
