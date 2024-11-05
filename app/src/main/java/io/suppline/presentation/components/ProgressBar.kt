@@ -14,9 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.suppline.presentation.ui.theme.colorSelected
 
 @Composable
 @Preview
@@ -45,7 +45,7 @@ fun AnimatedLinearProgressIndicator(modifier: Modifier, progress: Float) {
 
     // Animate the color from gray to green
     val animatedColor by animateColorAsState(
-        targetValue = Color.Green.copy(alpha = progress),
+        targetValue = colorSelected.copy(alpha = progress),
         animationSpec = tween(durationMillis = 1000), label = ""
     )
 

@@ -2,6 +2,8 @@ package io.suppline.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val colorSelected = Color(4,204,130)
+
 val primaryLight = Color(0xFF794F81)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFFDD6FF)
