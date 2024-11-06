@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.suppline.R
@@ -101,7 +102,7 @@ fun AddEditItem(
         }
         Row {
             ActionButton(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(8.dp).testTag(stringResource(id = R.string.add)),
                 text = "", //stringResource(id = R.string.add),
                 imageVector = Icons.Default.CheckCircle,
                 onClick = {
@@ -115,7 +116,7 @@ fun AddEditItem(
                 },
             )
             ActionButton(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(8.dp).testTag(stringResource(id = R.string.cancel)),
                 text = "", //stringResource(id = R.string.cancel),
                 imageVector = Icons.Default.Clear,
                 onClick = {
@@ -125,7 +126,7 @@ fun AddEditItem(
                 },
             )
             ActionButton(
-                modifier = Modifier.padding(8.dp),
+                modifier = Modifier.padding(8.dp).testTag(stringResource(id = R.string.remove)),
                 text = "", //stringResource(id = R.string.remove),
                 imageVector = Icons.Default.Delete,
                 onClick = {
