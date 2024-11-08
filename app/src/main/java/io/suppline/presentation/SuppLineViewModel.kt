@@ -243,15 +243,9 @@ class SuppLineViewModel @Inject constructor(
         )
     }
 
-    fun handleBroadcastAction(intent: Intent?) {
-        intent?.let {
-            //reload data to refresh UI
-            loadData()
-            val notificationId = it.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
-            val responseAction = NotificationResponseAction.fromInt(
-                it.getIntExtra(EXTRA_RESPONSE_ACTION_INT, -1)
-            )
-        }
+    fun handleBroadcastAction() {
+        //reload data to refresh UI
+        loadData()
     }
 
     fun scrollToIndex(index: Int) {

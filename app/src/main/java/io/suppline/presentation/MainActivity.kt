@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
 
     private val broadcastReceiver: NotificationReceiverContract = object : NotificationReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            viewModel.handleBroadcastAction(intent)
+            viewModel.handleBroadcastAction()
         }
     }
 
