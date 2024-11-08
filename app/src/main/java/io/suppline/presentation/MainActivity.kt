@@ -105,63 +105,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SuppLineTheme {
-
-                val state = viewModel.state.value
-                var showModal by remember {
-                    mutableStateOf(false)
-                }
-                showModal = (state.editedItem != null)
-
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column(
-                        modifier = Modifier.padding(innerPadding),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Logo(modifier = Modifier)
-                        //todo extract code to Screen composable fun
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            ActionButton(
-                                modifier = Modifier.padding(8.dp),
-                                text = stringResource(id = R.string.add_supplement),
-                                imageVector = Icons.Default.AddCircle,
-                                onClick = {
-                                    viewModel.setEditedItem()
-                                    showModal = true
-                                },
-                            )
-                        }
-                        if (state.groupSectionsByTime) GroupByTime(
-                            modifier = Modifier.weight(1f),
-                            viewModel = viewModel,
-                            index = state.scrollToIndex ?: -1
-                        ) else DefaultSections(
-                            modifier = Modifier.weight(1f),
-                            supplements = state.supplements,
-                            viewModel = viewModel,
-                            index = state.scrollToIndex ?: -1
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        ProgressBar(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(24.dp),
-                            progress = state.progress
-                        )
-                    }
-                }
-
-                if (showModal) {
-                    AddEditSupplementModal(
-                        viewModel = viewModel,
-                        setShowStats = { showModal = it },
-                    )
-                }
-
+                SuppLineScreen(modifier = Modifier, viewModel = viewModel)
             }
         }
     }
