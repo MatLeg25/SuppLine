@@ -8,10 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import dagger.hilt.android.EntryPointAccessors
 import io.suppline.R
 import io.suppline.domain.preferences.Preferences
 import io.suppline.domain.utils.extensions.localTimeToEpochMillis
@@ -30,6 +32,7 @@ import io.suppline.presentation.enums.ErrorType
 import io.suppline.presentation.enums.NotificationResponseAction
 import io.suppline.presentation.error.NotificationException
 import io.suppline.presentation.extension.parcelable
+import io.suppline.presentation.extension.toggleConsumed
 import io.suppline.presentation.mapper.toDomainModel
 import io.suppline.presentation.mapper.toParcelable
 import io.suppline.presentation.models.Notification
@@ -232,6 +235,7 @@ open class NotificationReceiver : NotificationReceiverContract() {
         context: Context?, notificationId: Int, responseAction: NotificationResponseAction
     ) {
         context?.let {
+            handleActionInBackground(context, notificationId, responseAction)
             val notificationManager = NotificationManagerCompat.from(context)
             notificationManager.cancel(NOTIFICATION_ID)
             val localIntent = Intent(NOTIFICATION_RESPONSE).apply {
@@ -260,6 +264,57 @@ open class NotificationReceiver : NotificationReceiverContract() {
         } catch (e: Exception) {
             println(">>>> Cannot reschedule notification: ${e.message}")
         }
+    }
+
+    private fun handleActionInBackground(
+        context: Context,
+        notificationId: Int,
+        responseAction: NotificationResponseAction
+    ) {
+        val dailySupplementation = getPreferences(context).loadDailySupplements() ?: return
+        val supplement = dailySupplementation.supplements.find { it.id == notificationId } ?: return
+
+        when (responseAction) {
+            NotificationResponseAction.SNOOZE -> {
+                try {
+                    scheduleNotification(
+                        context = context,
+                        notification = Notification(
+                            id = supplement.id,
+                            name = supplement.name,
+                            timeInMillis = supplement.timeToConsume.plusMinutes(15)
+                                .localTimeToEpochMillis(),
+                            active = true,
+                            isDaily = false
+                        )
+                    )
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.permission_denied_app_in_background),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            NotificationResponseAction.DONE -> {
+                getPreferences(context).saveDailySupplementation(
+                    dailySupplementation.copy(
+                        supplements = dailySupplementation.supplements.toggleConsumed(supplement)
+                    )
+                )
+            }
+
+            NotificationResponseAction.CANCEL -> Unit
+        }
+    }
+
+    private fun getPreferences(context: Context): Preferences {
+        val hiltEntryPoint = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            BootReceiverEntryPoint::class.java
+        )
+        return hiltEntryPoint.sharedPreferences()
     }
 
 }

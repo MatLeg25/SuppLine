@@ -22,5 +22,6 @@
     <string name="keyboard_arrow_up">Keyboard Arrow Up</string>
     <string name="keyboard_arrow_down">Keyboard Arrow Down</string>
     <string name="permission_denied">Allow notifications to use this feature.</string>
+    <string name="permission_denied_app_in_background">AllowCannot set notification. Please check app permission.</string>
     <string name="unknown_error_try_again_later">Unknown error, please try again later.</string>
 </resources>

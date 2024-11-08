@@ -16,6 +16,7 @@ import io.suppline.presentation.MainActivity.Companion.EXTRA_NOTIFICATION_ID
 import io.suppline.presentation.MainActivity.Companion.EXTRA_RESPONSE_ACTION_INT
 import io.suppline.presentation.enums.NotificationResponseAction
 import io.suppline.presentation.events.AddEditSupplementEvent
+import io.suppline.presentation.extension.toggleConsumed
 import io.suppline.presentation.models.Notification
 import io.suppline.presentation.states.NotificationState
 import io.suppline.presentation.states.SuppLineState
@@ -48,11 +49,7 @@ class SuppLineViewModel @Inject constructor(
     }
 
     private fun fetchData() {
-        //fetch from preferences or create new based on default
-        val supplementation = getSupplementation()
-        _state.value = state.value.copy(
-            date = supplementation.date, supplements = supplementation.supplements
-        )
+        loadData()
         setProgress()
     }
 
@@ -166,12 +163,7 @@ class SuppLineViewModel @Inject constructor(
 
     fun toggleConsumed(supplement: Supplement) {
         with(state.value) {
-            val list = supplements.toMutableList()
-            val indexToReplace = list.indexOf(supplement)
-            if (indexToReplace in 0..list.lastIndex) {
-                list[indexToReplace] = supplement.copy(consumed = !supplement.consumed)
-            }
-            _state.value = copy(supplements = list)
+            _state.value = copy(supplements = state.value.supplements.toggleConsumed(supplement))
         }
         setProgress()
         saveChanges()
@@ -243,38 +235,23 @@ class SuppLineViewModel @Inject constructor(
         )
     }
 
+    private fun loadData() {
+        //fetch from preferences or create new based on default
+        val supplementation = getSupplementation()
+        _state.value = state.value.copy(
+            date = supplementation.date, supplements = supplementation.supplements
+        )
+    }
+
     fun handleBroadcastAction(intent: Intent?) {
         intent?.let {
+            //reload data to refresh UI
+            loadData()
             val notificationId = it.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
             val responseAction = NotificationResponseAction.fromInt(
                 it.getIntExtra(EXTRA_RESPONSE_ACTION_INT, -1)
             )
-            when (responseAction) {
-                NotificationResponseAction.SNOOZE -> viewModelScope.launch {
-                    val supplement = state.value.supplements.first { it.id == notificationId }
-                    _updateNotification.emit(
-                        NotificationState(
-                            notification = Notification(
-                                id = supplement.id,
-                                name = supplement.name,
-                                timeInMillis = supplement.timeToConsume.plusMinutes(15)
-                                    .localTimeToEpochMillis(),
-                                active = true,
-                                isDaily = false
-                            )
-                        )
-                    )
-                }
-
-                NotificationResponseAction.DONE -> toggleConsumed(supplement = state.value.supplements.first { it.id == notificationId })
-
-                NotificationResponseAction.CANCEL -> Unit
-                else -> Unit
-            }
-
-            println(">>>>>>>>>>> action -> onResponse == $notificationId, $responseAction")
         }
-
     }
 
     fun scrollToIndex(index: Int) {
