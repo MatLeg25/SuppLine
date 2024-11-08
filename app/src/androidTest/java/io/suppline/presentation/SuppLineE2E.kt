@@ -8,10 +8,12 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.test.platform.app.InstrumentationRegistry
 import io.suppline.R
 import io.suppline.data.preferences.FakePreferences
 import io.suppline.domain.models.DailySupplementation
@@ -28,7 +30,9 @@ class SuppLineE2E {
     private val sampleDescription = "description"
 
     @get:Rule
-    val composeRule = createAndroidComposeRule<MainActivity>()
+    val composeRuleActivity = createAndroidComposeRule<MainActivity>()
+    @get:Rule
+    val composeRuleScreen = createComposeRule()
 
     private lateinit var viewModelFake: SuppLineViewModel
     private lateinit var preferencesFake: FakePreferences
@@ -46,38 +50,43 @@ class SuppLineE2E {
             getSupplementation = GetDailySupplementationUseCase(preferencesFake),
             saveSupplementation = SaveDailySupplementationUseCase(preferencesFake),
         )
+        composeRuleScreen.setContent {
+            SuppLineScreen(viewModel = viewModelFake)
+        }
     }
 
     @Test
     fun add_and_delete_items_correctly_update_ui_and_preferences() {
+        //check if preferences and viewmodel state has empty supplement list
+        assert(preferencesFake.loadDailySupplements()?.supplements?.isEmpty() ?: true)
         assert(viewModelFake.state.value.supplements.isEmpty())
         //top logo isDisplayed
-        composeRule.onNodeWithText(text = getString(R.string.suppline_title)).isDisplayed()
+        composeRuleScreen.onNodeWithText(text = getString(R.string.suppline_title)).isDisplayed()
         //check AddEdit modal
-        composeRule.onNodeWithText(text = getString(R.string.add_supplement)).performClick()
-        composeRule.onNodeWithTag(getString(R.string.add)).isDisplayed()
-        composeRule.onNodeWithTag(getString(R.string.cancel)).isDisplayed()
-        composeRule.onNodeWithTag(getString(R.string.remove)).isDisplayed()
+        composeRuleScreen.onNodeWithText(text = getString(R.string.add_supplement)).performClick()
+        composeRuleScreen.onNodeWithTag(getString(R.string.add)).isDisplayed()
+        composeRuleScreen.onNodeWithTag(getString(R.string.cancel)).isDisplayed()
+        composeRuleScreen.onNodeWithTag(getString(R.string.remove)).isDisplayed()
 
         //prevent adding item with empty name
-        composeRule.onNodeWithText(getString(R.string.name)).performTextInput("")
-        composeRule.onNodeWithTag(getString(R.string.add)).performClick()
-        composeRule.onNodeWithTag(getString(R.string.add)).isDisplayed()
+        composeRuleScreen.onNodeWithText(getString(R.string.name)).performTextInput("")
+        composeRuleScreen.onNodeWithTag(getString(R.string.add)).performClick()
+        composeRuleScreen.onNodeWithTag(getString(R.string.add)).isDisplayed()
 
         //add new item with [sampleName]
-        composeRule.onNodeWithText(getString(R.string.name)).performTextInput(sampleName)
-        composeRule.onNodeWithTag(getString(R.string.add)).performClick()
+        composeRuleScreen.onNodeWithText(getString(R.string.name)).performTextInput(sampleName)
+        composeRuleScreen.onNodeWithTag(getString(R.string.add)).performClick()
         //close AddEdit item modal
-        composeRule.onNodeWithTag(getString(R.string.add)).isNotDisplayed()
-        println(">>>>>>>>>>>>>>>>C ${preferencesFake.loadDailySupplements()?.supplements}")
-        println(">>>>>>>>>>>>>>>> ${viewModelFake.state.value.supplements}")
-        //state contains newly added item
-        val items = viewModelFake.state.value.supplements.count { it.name == sampleName }
-        assert(items == 1)
+        composeRuleScreen.onNodeWithTag(getString(R.string.add)).isNotDisplayed()
+        //check if preferences and viewmodel state has updated supplement list
+        val preferencesItem = preferencesFake.loadDailySupplements()?.supplements?.count { it.name == sampleName } ?: -1
+        val viewModelItem = viewModelFake.state.value.supplements.count { it.name == sampleName }
+        assert(preferencesItem == viewModelItem && viewModelItem == 1)
     }
 
     private fun getString(@StringRes stringRes: Int): String {
-        return composeRule.activity.getString(stringRes)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        return context.getString(stringRes)
     }
 
 }
