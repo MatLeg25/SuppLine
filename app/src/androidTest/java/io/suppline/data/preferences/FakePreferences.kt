@@ -1,4 +1,4 @@
-package io.suppline.data
+package io.suppline.data.preferences
 
 import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.preferences.Preferences

@@ -2,10 +2,7 @@ package io.suppline.presentation
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
-import io.suppline.data.preferences.DefaultPreferences
 import io.suppline.domain.models.Supplement
-import io.suppline.domain.preferences.Preferences
 import io.suppline.presentation.states.SuppLineState
 import org.junit.Before
 import java.time.LocalTime
@@ -13,7 +10,6 @@ import java.time.LocalTime
 //todo update test
 class SuppLineViewModelTest() {
 
-    lateinit var preferences: Preferences
     lateinit var viewModel: SuppLineViewModel
 
     private val DEFAULT_SUPPLEMENTS = listOf(

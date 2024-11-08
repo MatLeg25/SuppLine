@@ -13,7 +13,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import io.suppline.R
-import io.suppline.data.FakePreferences
+import io.suppline.data.preferences.FakePreferences
 import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
@@ -69,8 +69,11 @@ class SuppLineE2E {
         composeRule.onNodeWithTag(getString(R.string.add)).performClick()
         //close AddEdit item modal
         composeRule.onNodeWithTag(getString(R.string.add)).isNotDisplayed()
-
-        assert(1 == 1)
+        println(">>>>>>>>>>>>>>>>C ${preferencesFake.loadDailySupplements()?.supplements}")
+        println(">>>>>>>>>>>>>>>> ${viewModelFake.state.value.supplements}")
+        //state contains newly added item
+        val items = viewModelFake.state.value.supplements.count { it.name == sampleName }
+        assert(items == 1)
     }
 
     private fun getString(@StringRes stringRes: Int): String {

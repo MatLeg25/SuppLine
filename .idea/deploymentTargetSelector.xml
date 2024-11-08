@@ -19,6 +19,9 @@
       <SelectionState runConfigName="SuppLineE2E">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="add_and_delete_items_correctly_update_ui_and_preferences()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>
