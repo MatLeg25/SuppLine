@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.hours
 
 @HiltViewModel
 class SuppLineViewModel @Inject constructor(
@@ -182,11 +183,15 @@ class SuppLineViewModel @Inject constructor(
                 if (indexToReplace in 0..list.lastIndex) {
                     val oldSupplementNotification = list[indexToReplace]
                     //cancel deprecated notification
-                    emitNotification(oldSupplementNotification, false)
+                    if (oldSupplementNotification.hasNotification) {
+                        emitNotification(oldSupplementNotification, false)
+                    }
                     //update Supplement
                     list[indexToReplace] = supplement.copy(
                         timeToConsume = TimeValidator.validateTime(
-                            time = supplement.timeToConsume, hourDelta = hourDelta, minDelta = minDelta
+                            time = supplement.timeToConsume,
+                            hourDelta = hourDelta,
+                            minDelta = minDelta
                         ),
                         hasNotification = false
                     )
@@ -233,17 +238,16 @@ class SuppLineViewModel @Inject constructor(
     }
 
     private suspend fun emitNotification(supplement: Supplement, newState: Boolean) {
-        val isBeforeCurrentTime =
-            supplement.timeToConsume.localTimeToEpochMillis() < System.currentTimeMillis()
+        val isBeforeCurrentTime = supplement.timeToConsume.localTimeToEpochMillis() < System.currentTimeMillis()
+
         _updateNotification.emit(
             NotificationState(
                 notification = Notification(
                     id = supplement.id,
                     name = supplement.name,
                     timeInMillis =
-                    if (isBeforeCurrentTime) supplement.timeToConsume.localTimeToEpochMillis()
-                    else supplement.timeToConsume.plusHours(24)
-                        .localTimeToEpochMillis(),
+                    if (isBeforeCurrentTime) supplement.timeToConsume.localTimeToEpochMillis().plus(24.hours.inWholeMilliseconds)
+                    else supplement.timeToConsume.localTimeToEpochMillis(),
                     active = newState,
                     isDaily = true
                 )
