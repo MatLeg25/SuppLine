@@ -24,6 +24,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
 
@@ -239,7 +240,8 @@ class SuppLineViewModel @Inject constructor(
         //fetch from preferences or create new based on default
         val supplementation = getSupplementation()
         _state.value = state.value.copy(
-            date = supplementation.date, supplements = supplementation.supplements
+            date = supplementation?.date ?: LocalDate.now(),
+            supplements = supplementation?.supplements ?: emptyList()
         )
     }
 

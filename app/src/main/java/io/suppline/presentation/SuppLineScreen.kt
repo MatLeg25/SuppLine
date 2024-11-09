@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import io.suppline.R
 import io.suppline.presentation.components.ActionButton
@@ -64,23 +67,32 @@ fun SuppLineScreen(
                         },
                     )
                 }
-                if (state.groupSectionsByTime) GroupByTime(
-                    modifier = Modifier.weight(1f),
-                    viewModel = viewModel,
-                    index = state.scrollToIndex ?: -1
-                ) else DefaultSections(
-                    modifier = Modifier.weight(1f),
-                    supplements = state.supplements,
-                    viewModel = viewModel,
-                    index = state.scrollToIndex ?: -1
-                )
                 Spacer(modifier = Modifier.height(24.dp))
-                ProgressBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(24.dp),
-                    progress = state.progress
-                )
+                if (state.supplements.isNotEmpty()) {
+                    if (state.groupSectionsByTime) GroupByTime(
+                        modifier = Modifier.weight(1f),
+                        viewModel = viewModel,
+                        index = state.scrollToIndex ?: -1
+                    ) else DefaultSections(
+                        modifier = Modifier.weight(1f),
+                        supplements = state.supplements,
+                        viewModel = viewModel,
+                        index = state.scrollToIndex ?: -1
+                    )
+                    ProgressBar(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(24.dp),
+                        progress = state.progress
+                    )
+                } else {
+                    Text(
+                        text = stringResource(id = R.string.no_items_to_display),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
+                
             }
         }
 
