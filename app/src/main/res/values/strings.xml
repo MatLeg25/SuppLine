@@ -24,4 +24,5 @@
     <string name="permission_denied">Allow notifications to use this feature.</string>
     <string name="permission_denied_app_in_background">AllowCannot set notification. Please check app permission.</string>
     <string name="unknown_error_try_again_later">Unknown error, please try again later.</string>
+    <string name="select_consumed_test_tag">select_consumed_test_tag</string>
 </resources>

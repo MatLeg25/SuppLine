@@ -9,6 +9,7 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.isNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -100,6 +101,12 @@ class SuppLineE2E {
         val totalItems = preferencesFake.loadDailySupplements()?.supplements?.size
         val totalItemsVM = viewModelFake.state.value.supplements.size
         assert(totalItems == totalItemsVM && totalItemsVM == 2)
+
+        //select consumed
+        composeRuleScreen.onAllNodesWithTag(testTag = getString(R.string.select_consumed_test_tag)).get(0).performClick()
+        val consumedItemsPref = preferencesFake.loadDailySupplements()?.supplements?.count { it.consumed } ?: -1
+        val consumedItemsVM = viewModelFake.state.value.supplements.count { it.consumed }
+        assert(consumedItemsPref == consumedItemsVM && consumedItemsVM == 1)
     }
 
     private fun getString(@StringRes stringRes: Int): String {
