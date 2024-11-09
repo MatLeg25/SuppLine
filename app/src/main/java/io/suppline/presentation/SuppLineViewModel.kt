@@ -1,6 +1,5 @@
 package io.suppline.presentation
 
-import android.content.Intent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,9 +11,6 @@ import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import io.suppline.domain.utils.extensions.localTimeToEpochMillis
 import io.suppline.domain.utils.validators.TimeValidator
-import io.suppline.presentation.MainActivity.Companion.EXTRA_NOTIFICATION_ID
-import io.suppline.presentation.MainActivity.Companion.EXTRA_RESPONSE_ACTION_INT
-import io.suppline.presentation.enums.NotificationResponseAction
 import io.suppline.presentation.events.AddEditSupplementEvent
 import io.suppline.presentation.extension.toggleConsumed
 import io.suppline.presentation.models.Notification
@@ -51,7 +47,6 @@ class SuppLineViewModel @Inject constructor(
 
     private fun fetchData() {
         loadData()
-        setProgress()
     }
 
     override fun onEvent(event: AddEditSupplementEvent) {
@@ -180,19 +175,26 @@ class SuppLineViewModel @Inject constructor(
     }
 
     fun setConsumedTime(supplement: Supplement, hourDelta: Int, minDelta: Int) {
-        with(state.value) {
-            val list = supplements.toMutableList()
-            val indexToReplace = list.indexOf(supplement)
-            if (indexToReplace in 0..list.lastIndex) {
-                list[indexToReplace] = supplement.copy(
-                    timeToConsume = TimeValidator.validateTime(
-                        time = supplement.timeToConsume, hourDelta = hourDelta, minDelta = minDelta
+        viewModelScope.launch {
+            with(state.value) {
+                val list = supplements.toMutableList()
+                val indexToReplace = list.indexOf(supplement)
+                if (indexToReplace in 0..list.lastIndex) {
+                    val oldSupplementNotification = list[indexToReplace]
+                    //cancel deprecated notification
+                    emitNotification(oldSupplementNotification, false)
+                    //update Supplement
+                    list[indexToReplace] = supplement.copy(
+                        timeToConsume = TimeValidator.validateTime(
+                            time = supplement.timeToConsume, hourDelta = hourDelta, minDelta = minDelta
+                        ),
+                        hasNotification = false
                     )
-                )
+                }
+                _state.value = copy(supplements = list)
             }
-            _state.value = copy(supplements = list)
+            saveChanges()
         }
-        saveChanges()
     }
 
     fun setNotification(supplement: Supplement) {
@@ -206,23 +208,7 @@ class SuppLineViewModel @Inject constructor(
                         list[indexToReplace] = supplement.copy(hasNotification = newState)
                     }
                     _state.value = copy(supplements = list)
-
-                    val isBeforeCurrentTime =
-                        supplement.timeToConsume.localTimeToEpochMillis() < System.currentTimeMillis()
-                    _updateNotification.emit(
-                        NotificationState(
-                            notification = Notification(
-                                id = supplement.id,
-                                name = supplement.name,
-                                timeInMillis =
-                                if (isBeforeCurrentTime) supplement.timeToConsume.localTimeToEpochMillis()
-                                else supplement.timeToConsume.plusHours(24)
-                                    .localTimeToEpochMillis(),
-                                active = newState,
-                                isDaily = true
-                            )
-                        )
-                    )
+                    emitNotification(supplement = supplement, newState = newState)
                     saveChanges()
                 }
                 //trigger ask notification permission
@@ -242,6 +228,26 @@ class SuppLineViewModel @Inject constructor(
         _state.value = state.value.copy(
             date = supplementation?.date ?: LocalDate.now(),
             supplements = supplementation?.supplements ?: emptyList()
+        )
+        setProgress()
+    }
+
+    private suspend fun emitNotification(supplement: Supplement, newState: Boolean) {
+        val isBeforeCurrentTime =
+            supplement.timeToConsume.localTimeToEpochMillis() < System.currentTimeMillis()
+        _updateNotification.emit(
+            NotificationState(
+                notification = Notification(
+                    id = supplement.id,
+                    name = supplement.name,
+                    timeInMillis =
+                    if (isBeforeCurrentTime) supplement.timeToConsume.localTimeToEpochMillis()
+                    else supplement.timeToConsume.plusHours(24)
+                        .localTimeToEpochMillis(),
+                    active = newState,
+                    isDaily = true
+                )
+            )
         )
     }
 
