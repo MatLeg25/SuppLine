@@ -62,6 +62,7 @@ fun AddEditItem(
         Row {
             Column {
                 TextField(
+                    modifier = Modifier.testTag(stringResource(id = R.string.name)),
                     label = {
                         Text(text = stringResource(id = R.string.name))
                     },

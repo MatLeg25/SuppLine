@@ -61,6 +61,8 @@ class SuppLineE2E {
         //check if preferences and viewmodel state has empty supplement list
         assert(preferencesFake.loadDailySupplements()?.supplements?.isEmpty() ?: true)
         assert(viewModelFake.state.value.supplements.isEmpty())
+        //check progress state
+        assert(viewModelFake.state.value.progress == 0.0f)
         //top logo isDisplayed
         composeRuleScreen.onNodeWithText(text = getString(R.string.suppline_title)).isDisplayed()
         //check AddEdit modal
@@ -69,8 +71,10 @@ class SuppLineE2E {
         composeRuleScreen.onNodeWithTag(getString(R.string.cancel)).isDisplayed()
         composeRuleScreen.onNodeWithTag(getString(R.string.remove)).isDisplayed()
 
+        composeRuleScreen.waitForIdle() //wait modal is opening
+
         //prevent adding item with empty name
-        composeRuleScreen.onNodeWithText(getString(R.string.name)).performTextInput("")
+        composeRuleScreen.onNodeWithTag(getString(R.string.name)).performTextInput("")
         composeRuleScreen.onNodeWithTag(getString(R.string.add)).performClick()
         composeRuleScreen.onNodeWithTag(getString(R.string.add)).isDisplayed()
 
@@ -107,6 +111,17 @@ class SuppLineE2E {
         val consumedItemsPref = preferencesFake.loadDailySupplements()?.supplements?.count { it.consumed } ?: -1
         val consumedItemsVM = viewModelFake.state.value.supplements.count { it.consumed }
         assert(consumedItemsPref == consumedItemsVM && consumedItemsVM == 1)
+
+        //check progress state
+        assert(viewModelFake.state.value.progress == 0.5f)
+
+        //select consumed
+        composeRuleScreen.onAllNodesWithTag(testTag = getString(R.string.select_consumed_test_tag)).get(1).performClick()
+        val consumedItemsPref2 = preferencesFake.loadDailySupplements()?.supplements?.count { it.consumed } ?: -1
+        val consumedItemsVM2 = viewModelFake.state.value.supplements.count { it.consumed }
+        assert(consumedItemsPref2 == consumedItemsVM2 && consumedItemsVM2 == 2)
+        //check progress state
+        assert(viewModelFake.state.value.progress == 1.0f)
     }
 
     private fun getString(@StringRes stringRes: Int): String {
