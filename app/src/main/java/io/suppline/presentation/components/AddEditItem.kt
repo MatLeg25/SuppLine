@@ -81,6 +81,7 @@ fun AddEditItem(
                 )
 
                 TextField(
+                    modifier = Modifier.testTag(stringResource(id = R.string.description)),
                     label = {
                         Text(text = stringResource(id = R.string.description) + " [$descriptionCharactersLeft]")
                     },

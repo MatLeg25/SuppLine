@@ -87,12 +87,15 @@ class SuppLineE2E {
         val item2Name = "$sampleName-2"
         composeRuleScreen.onNodeWithText(text = getString(R.string.add_supplement)).performClick()
         composeRuleScreen.onNodeWithText(getString(R.string.name)).performTextInput(item2Name)
+        //put description
+        composeRuleScreen.onNodeWithTag(testTag = getString(R.string.description)).performClick()
+        composeRuleScreen.onNodeWithTag(testTag = getString(R.string.description)).performTextInput(sampleDescription)
         composeRuleScreen.onNodeWithTag(getString(R.string.add)).performClick()
         //close AddEdit item modal
         composeRuleScreen.onNodeWithTag(getString(R.string.add)).isNotDisplayed()
         //check if preferences and viewmodel state has updated supplement list
-        val preferencesItem2 = preferencesFake.loadDailySupplements()?.supplements?.count { it.name == item2Name } ?: -1
-        val viewModelItem2 = viewModelFake.state.value.supplements.count { it.name == item2Name }
+        val preferencesItem2 = preferencesFake.loadDailySupplements()?.supplements?.count { it.description == sampleDescription } ?: -1
+        val viewModelItem2 = viewModelFake.state.value.supplements.count { it.description == sampleDescription }
         assert(preferencesItem2 == viewModelItem2 && viewModelItem2 == 1)
         val totalItems = preferencesFake.loadDailySupplements()?.supplements?.size
         val totalItemsVM = viewModelFake.state.value.supplements.size
