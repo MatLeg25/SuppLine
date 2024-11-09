@@ -82,6 +82,21 @@ class SuppLineE2E {
         val preferencesItem = preferencesFake.loadDailySupplements()?.supplements?.count { it.name == sampleName } ?: -1
         val viewModelItem = viewModelFake.state.value.supplements.count { it.name == sampleName }
         assert(preferencesItem == viewModelItem && viewModelItem == 1)
+
+        //add new item with [item2Name]
+        val item2Name = "$sampleName-2"
+        composeRuleScreen.onNodeWithText(text = getString(R.string.add_supplement)).performClick()
+        composeRuleScreen.onNodeWithText(getString(R.string.name)).performTextInput(item2Name)
+        composeRuleScreen.onNodeWithTag(getString(R.string.add)).performClick()
+        //close AddEdit item modal
+        composeRuleScreen.onNodeWithTag(getString(R.string.add)).isNotDisplayed()
+        //check if preferences and viewmodel state has updated supplement list
+        val preferencesItem2 = preferencesFake.loadDailySupplements()?.supplements?.count { it.name == item2Name } ?: -1
+        val viewModelItem2 = viewModelFake.state.value.supplements.count { it.name == item2Name }
+        assert(preferencesItem2 == viewModelItem2 && viewModelItem2 == 1)
+        val totalItems = preferencesFake.loadDailySupplements()?.supplements?.size
+        val totalItemsVM = viewModelFake.state.value.supplements.size
+        assert(totalItems == totalItemsVM && totalItemsVM == 2)
     }
 
     private fun getString(@StringRes stringRes: Int): String {
