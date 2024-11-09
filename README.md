@@ -8,6 +8,9 @@
 ## Dark mode:
 ![SuppLine_dark_mode](https://github.com/user-attachments/assets/8693ab2d-b262-4ec9-9e98-17ef1f155fda)
 
+## Demo:
+[SuppLine-demo.webm](https://github.com/user-attachments/assets/5977eed4-9aab-4516-b409-6919ca39ef6e)
+
 ## Features:
  - create and modify supplements,
  - progress bar to monitor daily status,
