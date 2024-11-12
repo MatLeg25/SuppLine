@@ -10,7 +10,6 @@ import io.suppline.domain.models.Supplement
 import io.suppline.domain.useCase.GetDailySupplementationUseCase
 import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import io.suppline.domain.utils.extensions.localTimeToEpochMillis
-import io.suppline.domain.utils.validators.TimeValidator
 import io.suppline.presentation.events.AddEditSupplementEvent
 import io.suppline.presentation.extension.toggleConsumed
 import io.suppline.presentation.models.Notification
@@ -188,11 +187,9 @@ class SuppLineViewModel @Inject constructor(
                     }
                     //update Supplement
                     list[indexToReplace] = supplement.copy(
-                        timeToConsume = TimeValidator.validateTime(
-                            time = supplement.timeToConsume,
-                            hourDelta = hourDelta,
-                            minDelta = minDelta
-                        ),
+                        timeToConsume = supplement.timeToConsume
+                            .plusHours(hourDelta.toLong())
+                            .plusMinutes(minDelta.toLong()),
                         hasNotification = false
                     )
                 }
