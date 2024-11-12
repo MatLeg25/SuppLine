@@ -15,7 +15,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import dagger.hilt.android.EntryPointAccessors
 import io.suppline.R
+import io.suppline.domain.models.DailySupplementation
 import io.suppline.domain.preferences.Preferences
+import io.suppline.domain.useCase.SaveDailySupplementationUseCase
 import io.suppline.domain.utils.extensions.localTimeToEpochMillis
 import io.suppline.presentation.MainActivity
 import io.suppline.presentation.MainActivity.Companion.ACTION_NOTIFICATION_PRESSED
@@ -271,7 +273,7 @@ open class NotificationReceiver : NotificationReceiverContract() {
         notificationId: Int,
         responseAction: NotificationResponseAction
     ) {
-        val dailySupplementation = getPreferences(context).loadDailySupplements() ?: return
+        val dailySupplementation = getGetDailySupplementation(context) ?: return
         val supplement = dailySupplementation.supplements.find { it.id == notificationId } ?: return
 
         when (responseAction) {
@@ -298,7 +300,8 @@ open class NotificationReceiver : NotificationReceiverContract() {
             }
 
             NotificationResponseAction.DONE -> {
-                getPreferences(context).saveDailySupplementation(
+                val saveDailySupplementationUseCase = getSaveDailySupplementationUseCase(context)
+                saveDailySupplementationUseCase.invoke(
                     dailySupplementation.copy(
                         supplements = dailySupplementation.supplements.toggleConsumed(supplement)
                     )
@@ -309,12 +312,20 @@ open class NotificationReceiver : NotificationReceiverContract() {
         }
     }
 
-    private fun getPreferences(context: Context): Preferences {
+    private fun getGetDailySupplementation(context: Context): DailySupplementation? {
         val hiltEntryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
-            BootReceiverEntryPoint::class.java
+            GetDailySupplementationUseCaseEntryPoint::class.java
         )
-        return hiltEntryPoint.sharedPreferences()
+        return hiltEntryPoint.getDailySupplementationUseCase().invoke()
+    }
+
+    private fun getSaveDailySupplementationUseCase(context: Context): SaveDailySupplementationUseCase {
+        val hiltEntryPoint = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            SaveDailySupplementationUseCaseEntryPoint::class.java
+        )
+        return hiltEntryPoint.getSaveDailySupplementationUseCase()
     }
 
 }
