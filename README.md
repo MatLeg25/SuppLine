@@ -11,7 +11,6 @@
 ## Demo:
 [SuppLine-demo.webm](https://github.com/user-attachments/assets/5977eed4-9aab-4516-b409-6919ca39ef6e)
 
-
 ## Check it out!
 The app is not officially published in Google Play Store. If you want to check it out, you can do it using one of the following ways:
 
@@ -42,3 +41,4 @@ The app is not officially published in Google Play Store. If you want to check i
 ## Sources:
  - App icon based on: https://adioma.com/icons/pill
  - Theme generated with: https://material-foundation.github.io/material-theme-builder/
+ - Music used in the demo video: https://www.youtube.com/watch?v=4VZetzuEHoM
