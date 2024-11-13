@@ -22,7 +22,7 @@ The app is not officially published in Google Play Store. If you want to check i
    - a)  Clone repository.
    - b)  Open project in Android Studio.
    - c)  Build with Gradle.
-   - d)  Run on your device or emulator
+   - d)  Run on your device or emulator.
 
 
 ## Features:
