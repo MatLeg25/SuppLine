@@ -136,11 +136,14 @@ class SuppLineViewModel @Inject constructor(
     }
 
     private fun removeSupplement(supplement: Supplement) {
-        val list = state.value.supplements.toMutableList()
-        list.remove(supplement)
-        _state.value = state.value.copy(
-            supplements = list
-        )
+        viewModelScope.launch {
+            val list = state.value.supplements.toMutableList()
+            list.remove(supplement)
+            _state.value = state.value.copy(
+                supplements = list
+            )
+            cancelNotification(supplement)
+        }
     }
 
     fun onEditClick(supplement: Supplement) {
@@ -182,9 +185,7 @@ class SuppLineViewModel @Inject constructor(
                 if (indexToReplace in 0..list.lastIndex) {
                     val oldSupplementNotification = list[indexToReplace]
                     //cancel deprecated notification
-                    if (oldSupplementNotification.hasNotification) {
-                        emitNotification(oldSupplementNotification, false)
-                    }
+                    cancelNotification(oldSupplementNotification)
                     //update Supplement
                     list[indexToReplace] = supplement.copy(
                         timeToConsume = supplement.timeToConsume
@@ -215,6 +216,12 @@ class SuppLineViewModel @Inject constructor(
                 }
                 //trigger ask notification permission
             } else _updateNotification.emit(NotificationState(notification = null))
+        }
+    }
+
+    private suspend fun cancelNotification(supplement: Supplement) {
+        if (supplement.hasNotification) {
+            emitNotification(supplement, false)
         }
     }
 
