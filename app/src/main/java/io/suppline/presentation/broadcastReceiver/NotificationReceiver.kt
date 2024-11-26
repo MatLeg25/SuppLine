@@ -44,28 +44,27 @@ import kotlin.time.Duration.Companion.hours
 open class NotificationReceiver : NotificationReceiverContract() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        val notification = intent?.parcelable<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION) ?: return
+        val notification =
+            intent?.parcelable<ParcelableNotification>(EXTRA_PARCELABLE_NOTIFICATION) ?: return
         when (intent.action) {
 
             ACTION_SHOW_NOTIFICATION -> {
                 context?.let {
                     showNotification(context = it, notification = notification)
-                    //set for next day
-                    if (notification.isDaily) {
-                        scheduleNotification(
-                            context = it,
-                            notification = notification.toDomainModel().copy(
-                                timeInMillis = notification.timeInMillis.plus(24.hours.inWholeMilliseconds)
-                            )
-                        )
-                    }
-
+                    setForNextDay(context = it, notification = notification)
                 }
             }
 
-            BTN_ACTION_SNOOZE -> handleUserAction(
-                context, notification.id, NotificationResponseAction.SNOOZE
-            )
+            BTN_ACTION_SNOOZE -> {
+                context?.let {
+                    //set notification (with original time) for next day
+                    setForNextDay(context = it, notification = notification)
+                    //set delayed notification (+15min) for today only
+                    handleUserAction(
+                        context, notification.id, NotificationResponseAction.SNOOZE
+                    )
+                }
+            }
 
             BTN_ACTION_DONE -> handleUserAction(
                 context, notification.id, NotificationResponseAction.DONE
@@ -112,6 +111,17 @@ open class NotificationReceiver : NotificationReceiverContract() {
     @Throws(NotificationException::class)
     override fun hasPermissions(context: Context): Boolean {
         return hasNotificationsPermission(context) && hasScheduleExactAlarmsPermission(context)
+    }
+
+    private fun setForNextDay(notification: ParcelableNotification, context: Context) {
+        if (notification.isDaily) {
+            scheduleNotification(
+                context = context,
+                notification = notification.toDomainModel().copy(
+                    timeInMillis = notification.timeInMillis.plus(24.hours.inWholeMilliseconds)
+                )
+            )
+        }
     }
 
     private fun hasNotificationsPermission(context: Context): Boolean {
